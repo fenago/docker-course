@@ -20,6 +20,9 @@ COPY *.php /var/www/html
 # Set working directory
 WORKDIR /var/www/html
 
+# Remove default index.html
+RUN rm /var/www/html/index.html
+
 # Create health check
 HEALTHCHECK --interval=5s --timeout=3s --retries=3 CMD curl -f http://localhost || exit 1
 
