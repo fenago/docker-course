@@ -1984,7 +1984,7 @@ required before starting:
 
     
     ```
-    python3 validator-cli.py -u https://github.com/PacktWorkshops/The-Docker-Workshop/blob/master/Chapter11/Exercise11.03/docker-compose.yaml -fi 'Duplicate Keys,Duplicate ports,Typing mistakes,DNS,Duplicate expose'
+    python3 validator-cli.py -u https://github.com/fenago/docker-course/blob/master/lab11/Exercise11.03/docker-compose.yaml -fi 'Duplicate Keys,Duplicate ports,Typing mistakes,DNS,Duplicate expose'
     ```
     
 
