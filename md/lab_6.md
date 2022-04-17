@@ -7,7 +7,7 @@ level of the Docker host, and how containers can leverage Docker
 networking to provide direct network connectivity to other containerized
 services. By the end of this lab, you will know how to deploy
 containers using networking configurations such as `bridge`,
-`overlay`, `macvlan`, and `host`. You will
+`overlay`, and `host`. You will
 learn the benefits of different networking drivers and under which
 circumstances you should choose certain network drivers. Finally, we
 will look at containerized networking between hosts deployed in a Docker
@@ -51,14 +51,13 @@ infrastructure:
     or networking driver, Docker will create the container using a
     `bridge` network. This network exists behind a
     `bridge` network interface configured in your host OS. Use
-    `ifconfig` in a Linux or macOS Bash shell, or
-    `ipconfig` in Windows PowerShell, to see which interface
+    `ipconfig` to see which interface
     the Docker bridge is configured as. It is generally called
     `docker0`:
 
     
     ```
-    ifconfig 
+    ipconfig 
     ```
     
 
@@ -71,9 +70,9 @@ infrastructure:
 
 
 
-    It can be observed in the preceding figure that the Docker
-    `bridge` interface is called `docker0` and has
-    an IP address of `172.17.0.1`.
+It can be observed in the preceding figure that the Docker
+`bridge` interface is called `docker0` and has
+an IP address of `172.17.0.1`.
 
 3.  Use the `docker run` command to create a simple NGINX web
     server container, using the `latest` image tag. Set the
@@ -132,77 +131,7 @@ infrastructure:
     
 
 
-
-    From this output, it can be concluded that this container lives in
-    the default Docker `bridge` network. Looking at the first
-    12 characters of `NetworkID`, you will observe that it is
-    the same identifier used in the output of the
-    `docker network ls` command, which was executed in *step
-    1*. It should also be noted that the `Gateway` this
-    container is configured to use is the IP address of the
-    `docker0` `bridge` interface. Docker will use
-    this interface as an egress point to access networks in other
-    subnets outside itself, as well as forwarding traffic from our
-    environment to the containers in the subnet. It can also be observed
-    that this container has a unique IP address within the Docker bridge
-    network, `172.17.0.2` in this example. Our local machine
-    has the ability to route to this subnet since we have the
-    `docker0` `bridge` interface available to
-    forward traffic. Finally, it can be observed that the NGINX
-    container is by default exposing TCP port `80` for
-    incoming traffic.
-
-6.  In a web browser, access the `webserver1` container by IP
-    address over port `80`. Enter the IP address of the
-    `webserver1` container in your favorite web browser:
-
-    
-    ![](./images/B15021_06_03.jpg)
-
-
-7.  Alternatively, use the `curl` command to see similar
-    output, albeit in text format:
-
-    
-    ```
-    curl 172.17.0.2:80
-    ```
-    
-
-    The following HTML response indicates that you have received a
-    response from the running NGINX container:
-
-    
-    ```
-    <!DOCTYPE html>
-    <html>
-    <head>
-    <title>Welcome to nginx!</title>
-    <style>
-        body {
-            width: 35em;
-            margin: 0 auto;
-            font-family: Tahoma, Verdana, Arial, sans-serif;
-        }
-    </style>
-    </head>
-    <body>
-    <h1>Welcome to nginx!</h1>
-    <p>If you see this page, the nginx web server is successfully 
-    installed and working. Further configuration is required.</p>
-    <p>For online documentation and support please refer to
-    <a href="http://nginx.org/">nginx.org</a>.<br/>
-    Commercial support is available at
-    <a href="http://nginx.com/">nginx.com</a>.</p>
-    <p><em>Thank you for using nginx.</em></p>
-    </body>
-    </html>
-    ```
-    
-
-8.  Accessing the IP address of a container in the local
-    `bridge` subnet works well for testing containers locally.
-    To expose your service on the network to other users or servers, use
+8.  To expose your service on the network to other users or servers, use
     the `-p` flag in the `docker run` command. This
     will allow you to map a port on the host to an exposed port on the
     container. This is similar to port forwarding on a router or other
@@ -253,22 +182,12 @@ infrastructure:
     deduced from the `0.0.0.0:8080->80/tcp` part of the
     output.
 
-    Note
-
-    It is important to remember that the host machine port is always to
-    the left of the colon, while the container port is to the right when
-    specifying ports with the `-p` flag.
-
 10. In your web browser, navigate to `http://localhost:8080`
     to see the running container instance you just spawned:
 
     
-    ![Figure 6.4: NGINX default page indicating that you have
-    successfully forwarded a port to your web server container](./images/B15021_06_04.jpg)
+    ![](./images/B15021_06_04.jpg)
     
-
-
-    forwarded a port to your web server container
 
 11. Now, you have two NGINX instances running in the same Docker
     environment with slightly different networking configurations. The
@@ -294,17 +213,16 @@ infrastructure:
     
 
 
-
-    As the `docker inspect` output displays, the
-    `webserver2` container has an IP address of
-    `172.17.0.3`, whereas your `webserver1`
-    container has an IP address of `172.17.0.1`. The IP
-    addresses in your local environment may be slightly different
-    depending on how Docker assigns the IP addresses to the containers.
-    Both the containers live on the same Docker network
-    (`bridge`) and have the same default gateway, which is the
-    `docker0` `bridge` interface on the host
-    machine.
+As the `docker inspect` output displays, the
+`webserver2` container has an IP address of
+`172.17.0.3`, whereas your `webserver1`
+container has an IP address of `172.17.0.1`. The IP
+addresses in your local environment may be slightly different
+depending on how Docker assigns the IP addresses to the containers.
+Both the containers live on the same Docker network
+(`bridge`) and have the same default gateway, which is the
+`docker0` `bridge` interface on the host
+machine.
 
 12. Since both of these containers live on the same subnet, you can test
     communication between the containers within the Docker
@@ -345,17 +263,16 @@ infrastructure:
 ![](./images/B15021_06_06.jpg)
     
 
-
-
 14. Once the `ping` utility has successfully installed, use it
     to ping the IP address of the other container:
 
     
     ```
-    root@3267bf4322ed:/# ping 172.17.0.3
+    root@3267bf4322ed:/# ping <ADD_WEBSERVER2_IP_ADDRESS_HERE>
     ```
     
-
+![](./images/19.png)
+    
     The output should display ICMP response packets, indicating that the
     containers can successfully ping each other through the Docker
     `bridge` network:
@@ -393,7 +310,7 @@ infrastructure:
 
     
     ```
-    root@3267bf4322ed:/# curl 172.17.0.3
+    root@3267bf4322ed:/# curl <ADD_WEBSERVER2_IP_ADDRESS_HERE>
     ```
     
 
@@ -434,15 +351,8 @@ infrastructure:
     welcome page, it will render on your terminal display in raw HTML
     format.
 
-In this section, we have successfully spawned two NGINX web server
-instances in the same Docker environment. We configured one instance to
-not expose any ports outside the default Docker network, while we
-configured the second NGINX instance to run on the same network but to
-expose port `80` to the host system on port `8080`.
-We saw how these containers could be accessed using a standard internet
-web browser as well as by the `curl` utility in Linux.
 
-During this exercise, we also saw how containers can use Docker networks
+During this exercise, we saw how containers can use Docker networks
 to talk to other containers directly. We used the `webserver1`
 container to call the IP address of the `webserver2` container
 and display the output of the web page the container was hosting.
@@ -515,8 +425,7 @@ service:
     ```
     
 
-    This should drop you into a root `sh` shell in the
-    `containerlink2` container.
+    This should drop you into a root `sh` shell in the `containerlink2` container.
 
 4.  From the shell of the `containerlink2` container, ping
     `containerlink1`:
@@ -531,10 +440,10 @@ service:
 
     
     ```
-    PING container1 (172.17.0.2): 56 data bytes
-    64 bytes from 172.17.0.2: seq=0 ttl=64 time=0.307 ms
-    64 bytes from 172.17.0.2: seq=1 ttl=64 time=0.162 ms
-    64 bytes from 172.17.0.2: seq=2 ttl=64 time=0.177 ms
+    PING container1 (172.17.0.X): 56 data bytes
+    64 bytes from 172.17.0.X: seq=0 ttl=64 time=0.307 ms
+    64 bytes from 172.17.0.X: seq=1 ttl=64 time=0.162 ms
+    64 bytes from 172.17.0.X: seq=2 ttl=64 time=0.177 ms
     ```
     
 
@@ -549,8 +458,7 @@ service:
     ```
     
 
-    The output of the `hosts` file should display and resemble
-    the following:
+    The output of the `hosts` file should display and resemble the following:
 
     
     ```
@@ -570,7 +478,7 @@ service:
     an entry for the `containerlink1` container name as well
     as its container ID. This enables the `containerlink2`
     container to know the name, and the container ID is mapped to the IP
-    address `172.17.0.2`. Typing the `exit` command
+    address. Typing the `exit` command
     will terminate the `sh` shell session and bring you back
     to your environment\'s main terminal.
 
@@ -610,14 +518,6 @@ service:
     `hosts` file entry has been created in the
     `containerlink1` container instance.
 
-    Note
-
-    You can only link to running containers using the legacy link method
-    between containers. This means that the first container cannot link
-    to containers that get started later. This is one of the many
-    reasons why using links between containers is no longer a
-    recommended approach. We are covering the concept in this lab to
-    show you how the functionality works.
 
 8.  Due to the limitations using the legacy link method, Docker also
     supports native DNS using user-created Docker networks. To leverage
@@ -632,13 +532,8 @@ service:
     ```
     docker network create dnsnet --subnet 192.168.54.0/24 --gateway 192.168.54.1
     ```
-    
 
-    Depending on the version of Docker you are using, the successful
-    execution of this command may return the ID of the network you have
-    created.
-
-    Note
+    **Note**
 
     Simply using the `docker network create dnsnet` command
     will create a network with a Docker-allocated subnet and gateway.
@@ -688,29 +583,6 @@ service:
 ![](./images/B15021_06_08.jpg)
     
 
-
-
-11. Since this is a Docker `bridge` network, Docker will also
-    create a corresponding bridge network interface for this network.
-    The IP address of the `bridge` network interface will be
-    the same IP address as the default gateway address you specified
-    when creating this network. Use the `ifconfig` command to
-    view the configured network interfaces on Linux or macOS. If you are
-    using Windows, use the `ipconfig` command:
-
-    
-    ```
-    ifconfig
-    ```
-    
-
-    This should display the output of all available network interfaces,
-    including the newly created `bridge` interface:
-
-    
-    ![](./images/B15021_06_09.jpg)
-
-
 12. Now that a new Docker network has been created, use the
     `docker run` command to start a new container
     (`alpinedns1`) within this network. Use the
@@ -737,7 +609,7 @@ service:
     ```
     
 
-    Note
+    **Note**
 
     It is important to understand the difference between the
     `–network-alias` flag and the `--name` flag. The
@@ -756,17 +628,7 @@ service:
     ```
     
 
-    The output will display the running container instances:
-
-    
-    ```
-    CONTAINER ID    IMAGE           COMMAND      CREATED 
-      STATUS              PORTS             NAMES
-    69ecb9ad45e1    alpine:latest   "/bin/sh"    4 seconds ago
-      Up 2 seconds                          alpinedns2
-    9b57038fb9c8    alpine:latest   "/bin/sh"    6 minutes ago
-      Up 6 minutes                          alpinedns1
-    ```
+The output will display the running container instances.
     
 
 15. Use the `docker inspect` command to verify that the IP
@@ -782,12 +644,8 @@ service:
     The following output is truncated to show the relevant details:
 
     
-    ![Figure: 6.10: Output from the Networks section of the alpinedns1
-    container instance ](./images/B15021_06_10.jpg)
+    ![](./images/B15021_06_10.jpg)
     
-
-    Figure: 6.10: Output from the Networks section of the alpinedns1
-    container instance
 
     It can be observed from the output that the `alpinedns1`
     container was deployed with an IP address of
@@ -864,7 +722,7 @@ service:
 
     
     ```
-    $ ping alpinedns1
+    ping alpinedns1
     ```
     
 
@@ -877,13 +735,7 @@ service:
     64 bytes from 192.168.54.2: seq=0 ttl=64 time=0.115 ms
     64 bytes from 192.168.54.2: seq=1 ttl=64 time=0.231 ms
     ```
-    
 
-    Note
-
-    Docker DNS, as opposed to the legacy link method, allows
-    bidirectional communication between containers in the same Docker
-    network.
 
 21. Use the `cat` utility inside any of the
     `alpinedns` containers to reveal that Docker is using true
@@ -969,21 +821,6 @@ about the IP addresses of the other running containers. Instead,
 communication can be initiated by simply calling the other containers by
 name.
 
-We first explored the legacy link method of name resolution, by which
-running containers can establish a relationship, leveraging a
-unidirectional relationship using entries in the container\'s
-`hosts` file. The second and more modern way to use DNS
-between containers is by creating user-defined Docker networks that
-allow DNS resolution bidirectionally. This will enable all containers on
-the network to resolve all other containers by name or container ID
-without any additional configuration.
-
-As we have seen in this section, Docker provides many unique ways to
-provide reliable networking resources to container instances, such as
-enabling routing between containers on the same Docker network and
-native DNS services between containers. This is only scratching the
-surface of the network options that are provided by Docker.
-
 In the next section, we will learn about deploying containers using
 other types of networking drivers to truly provide maximum flexibility
 when deploying containerized infrastructure.
@@ -999,32 +836,11 @@ Exercise 6.03: Exploring Docker Networks
 
 In this exercise, we will look into the various types of Docker network
 drivers that are supported in Docker by default, such as
-`host`, `none`, and `macvlan`. We will
+`host` and `none`. We will
 start with the `bridge` network and then look into the
-`none`, `host`, and `macvlan` networks:
+`none`and `host` networks:
 
-1.  First, you need to get an idea of how networking is set up in your
-    Docker environment. From a Bash or PowerShell terminal, use the
-    `ifconfig` or `ipconfig` command on Windows.
-    This will display all the network interfaces in your Docker
-    environment:
-
-    
-    ```
-    ifconfig
-    ```
-    
-
-    This will display all the network interfaces you have available. You
-    should see a `bridge` interface called
-    `docker0`. This is the Docker `bridge` interface
-    that serves as the entrance (or ingress point) into the default
-    Docker network:
-
-    
-    ![](./images/B15021_06_12.jpg)
-
-2.  Use the `docker network ls` command to view the networks
+1.  Use the `docker network ls` command to view the networks
     available in your Docker environment:
 
     
@@ -1064,27 +880,6 @@ start with the `bridge` network and then look into the
 ![](./images/B15021_06_13.jpg)
     
 
-
-
-    Some key parameters to note in this output are the
-    `Scope`, `Subnet`, and `Gateway`
-    keywords. Based on this output, it can be observed that the scope of
-    this network is only the local host machine
-    (`Scope: Local`). This indicates the network is not shared
-    between hosts in a Docker swarm cluster. The `Subnet`
-    value of this network under the `Config` section is
-    `172.17.0.0/16`, and the `Gateway` address for
-    the subnet is an IP address within the defined subnet
-    (`172.17.0.1`). It is critical that the
-    `Gateway` value of a subnet is an IP address within that
-    subnet to enable containers deployed in that subnet to access other
-    networks outside the scope of that network. Finally, this network is
-    tied to the host interface, `docker0`, which will serve as
-    the `bridge` interface for the network. The output of the
-    `docker network inspect` command can be very helpful in
-    getting a full understanding of how containers deployed in that
-    network are expected to behave.
-
 4.  View the verbose details of the `host` network using the
     `docker network inspect` command:
 
@@ -1103,12 +898,12 @@ start with the `bridge` network and then look into the
 
 
 
-    As you can see, there is not very much configuration present in the
-    `host` network. Since it uses the `host`
-    networking driver, all the container\'s networking will be shared
-    with the host. Hence, this network configuration does not need to
-    define specific subnets, interfaces, or other metadata, as we have
-    seen in the default `bridge` network from before.
+As you can see, there is not very much configuration present in the
+`host` network. Since it uses the `host`
+networking driver, all the container\'s networking will be shared
+with the host. Hence, this network configuration does not need to
+define specific subnets, interfaces, or other metadata, as we have
+seen in the default `bridge` network from before.
 
 5.  Investigate the `none` network next. Use the
     `docker network inspect` command to view the details of
@@ -1124,25 +919,12 @@ start with the `bridge` network and then look into the
 
     
 ![](./images/B15021_06_15.jpg)
-    
 
+Similar to the `host` network, the `none`
+network is mostly empty. Since containers deployed in this network
+will have no network connectivity by leveraging the `null`
+driver, there isn\'t much need for configuration.
 
-
-    Similar to the `host` network, the `none`
-    network is mostly empty. Since containers deployed in this network
-    will have no network connectivity by leveraging the `null`
-    driver, there isn\'t much need for configuration.
-
-    Note
-
-    Be aware that the difference between the `none` and
-    `host` networks lies in the driver they use, despite the
-    fact that the configurations are almost identical. Containers
-    launched in the `none` network have no network
-    connectivity at all, and no network interfaces are assigned to the
-    container instance. However, containers launched in the
-    `host` network will share the networking stack with the
-    host system.
 
 6.  Now create a container in the `none` network to observe
     its operation. In your terminal or PowerShell session, use the
@@ -1202,10 +984,9 @@ start with the `bridge` network and then look into the
     
 
 
-
-    The `docker inspect` output will reveal that this
-    container does not have an IP address, nor does it have a gateway or
-    any other networking settings.
+The `docker inspect` output will reveal that this
+container does not have an IP address, nor does it have a gateway or
+any other networking settings.
 
 9.  Use the `docker exec` command to access an `sh`
     shell inside this container:
@@ -1238,13 +1019,8 @@ start with the `bridge` network and then look into the
     container:
 
     
-    ```
-    1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state 
-    UNKNOWN qlen 1000
-        link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-        inet 127.0.0.1/8 scope host lo
-        valid_lft forever preferred_lft forever
-    ```
+    ![](./images/20.png)
+    
     
 
     The only network interface available to this container is its
@@ -1273,53 +1049,10 @@ start with the `bridge` network and then look into the
     ```
     
 
-    Use the `exit` command to return to your main terminal
-    session.
+    Use the `exit` command to return to your main terminal session.
 
-    Now that you have taken a closer look at the `none`
-    network, consider the `host` networking driver. The
-    `host` networking driver in Docker is unique since it
-    doesn\'t have any intermediate interfaces or create any extra
-    subnets. Instead, the `host` networking driver shares the
-    networking stack with the host operating system such that any
-    network interfaces that are available to the host are also available
-    to containers running in `host` mode.
-
-12. To get started with running a container in `host` mode,
-    execute `ifconfig` if you are running macOS or Linux, or
-    use `ipconfig` if you are running on Windows, to take
-    inventory of the network interfaces that are available on the host
-    machine:
-
-    
-    ```
-    ifconfig
-    ```
-    
-
-    This should output a list of network interfaces available on your
-    host machine:
-
-    
-    ![](./images/B15021_06_12.jpg)
-
-    In this example, the primary network interface of your host machine
-    is `enp1s0` with an IP address of
-    `192.168.122.185`.
-
-    Note
-
-    Some versions of Docker Desktop on macOS or Windows may not properly
-    be able to start and run containers in `host` network mode
-    or using `macvlan `network drivers, due to the
-    dependencies on the Linux kernel to provide many of these
-    functionalities. When running these examples on macOS or Windows,
-    you may see the network details of the underlying Linux virtual
-    machine running Docker, as opposed to the network interfaces
-    available on your macOS or Windows host machine.
-
-13. Use the `docker run` command to start an Alpine Linux
-    container in the `host` network. Name it
+12. To get started with running a container in `host` mode. Use the `docker run` command to start 
+    an Alpine Linux container in the `host` network. Name it
     `hostnet1` to tell it apart from the other containers:
 
     
@@ -1328,8 +1061,7 @@ start with the `bridge` network and then look into the
     ```
     
 
-    Docker will start this container in the background using the
-    `host` network.
+    Docker will start this container in the background using the `host` network.
 
 14. Use the `docker inspect` command to look at the network
     configuration of the `hostnet1` container you just
@@ -1348,14 +1080,12 @@ start with the `bridge` network and then look into the
 ![](./images/B15021_06_18.jpg)
     
 
-
-
-    It should be noted that the output of the
-    `NetworkSettings` block will look a lot like the
-    containers you deployed in the `none` network. In the
-    `host` networking mode, Docker will not assign an IP
-    address or gateway to the container instance since it shares all
-    network interfaces with the host machine directly.
+It should be noted that the output of the
+`NetworkSettings` block will look a lot like the
+containers you deployed in the `none` network. In the
+`host` networking mode, Docker will not assign an IP
+address or gateway to the container instance since it shares all
+network interfaces with the host machine directly.
 
 15. Use `docker exec` to access an `sh` shell inside
     this container, providing the name `hostnet1`:
@@ -1385,12 +1115,6 @@ start with the `bridge` network and then look into the
     
     ![](./images/B15021_06_19.jpg)
 
-
-    Note that this list of network interfaces is identical to that which
-    you encountered when querying the host machine directly. This is
-    because this container and the host machine are sharing the network
-    directly. Anything available to the host machine will also be
-    available to containers running in `host` network mode.
 
 17. Use the `exit` command to end the shell session and return
     to the terminal of the host machine.
@@ -1476,288 +1200,11 @@ start with the `bridge` network and then look into the
     
 
 
+Essentially, this second instance of an NGINX container was unable
+to start properly because it was unable to bind to port
+`80` on the host machine. The reason for this is that the
+`hostnet2` container is already listening on that port.
 
-    Essentially, this second instance of an NGINX container was unable
-    to start properly because it was unable to bind to port
-    `80` on the host machine. The reason for this is that the
-    `hostnet2` container is already listening on that port.
-
-    Note
-
-    Note that containers running in `host` networking mode
-    need to be deployed with care and consideration. Without proper
-    planning and architecture, container sprawl can lead to a variety of
-    port conflicts across container instances that are running on the
-    same machine.
-
-23. The next type of native Docker network you will investigate is
-    `macvlan`. In a `macvlan` network, Docker will
-    allocate a MAC address to a container instance to make it appear as
-    a physical host on a particular network segment. It can run either
-    in `bridge` mode, which uses a parent `host`
-    network interface to gain physical access to the underlay network,
-    or in `802.1Q trunk` mode, which leverages a sub-interface
-    that Docker creates on the fly.
-
-24. To begin, create a new network utilizing the `macvlan`
-    Docker network driver by specifying a physical interface on your
-    host machine as the parent interface using the
-    `docker network create` command.
-
-25. Earlier in the `ifconfig` or `ipconfig` output,
-    you saw that the `enp1s0` interface is the primary network
-    interface on the machine. Substitute the name of the primary network
-    interface of your machine. Since you are using the primary network
-    interface of the host machine as the parent, specify the same subnet
-    (or a smaller subnet within that space) for the network connectivity
-    of our containers. Use a `192.168.122.0/24` subnet here,
-    since it is the same subnet of the primary network interface.
-    Likewise, you want to specify the same default gateway as the parent
-    interface. Use the same subnet and gateway of your host machine:
-
-    
-    ```
-    docker network create -d macvlan --subnet=192.168.122.0/24 --gateway=192.168.122.1 -o parent=enp1s0 macvlan-net1
-    ```
-    
-
-    This command should create a network called
-    `macvlan-net1`.
-
-26. Use the `docker network ls` command to confirm that the
-    network has been created and is using the `macvlan`
-    network driver:
-
-    
-    ```
-    docker network ls
-    ```
-    
-
-    This command will output all the currently configured networks that
-    are defined in your environment. You should see the
-    `macvlan-net1` network:
-
-    
-    ```
-    NETWORK ID       NAME            DRIVER     SCOPE
-    f4c9408f22e2     bridge          bridge     local
-    f52b4a5440ad     host            host       local
-    b895c821b35f     macvlan-net1    macvlan    local
-    9bed60b88784     none            null       local
-    ```
-    
-
-27. Now that the `macvlan` network has been defined in Docker,
-    create a container in this network and investigate the network
-    connectivity from the host\'s perspective. Use the
-    `docker run` command to create another Alpine Linux
-    container named `macvlan1` using the `macvlan`
-    network `macvlan-net1`:
-
-    
-    ```
-    docker run -itd --name macvlan1 --network macvlan-net1 alpine:latest
-    ```
-    
-
-    This should start an Alpine Linux container instance called
-    `macvlan1` in the background.
-
-28. Use the `docker ps -a` command to check and make sure this
-    container instance is running:
-
-    
-    ```
-    docker ps -a
-    ```
-    
-
-    This should reveal that the container named `macvlan1` is
-    up and running as expected:
-
-    
-    ```
-    CONTAINER ID   IMAGE           COMMAND      CREATED
-      STATUS              PORTS              NAMES
-    cd3c61276759   alpine:latest   "/bin/sh"    3 seconds ago
-      Up 1 second                            macvlan1
-    ```
-    
-
-29. Use the `docker inspect` command to investigate the
-    networking configuration of this container instance:
-
-    
-    ```
-    docker inspect macvlan1
-    ```
-    
-
-    The verbose output of the container configuration should be
-    displayed. The following output has been truncated to show only the
-    network settings section in JSON format:
-
-    
-    ![](./images/B15021_06_22.jpg)
-
-    From this output, you can see that this container instance (similar
-    to containers in other networking modes) has both an IP address and
-    a default gateway. It can also be concluded that this container also
-    has an OSI Model Layer 2 MAC address within the
-    `192.168.122.0/24` network, based on the
-    `MacAddress` parameter under the `Networks`
-    subsection. Other hosts within this network segment would believe
-    this machine is another physical node living in this subnet, not a
-    container hosted inside a node on the subnet.
-
-30. Use `docker run` to create a second container instance
-    named `macvlan2` inside the `macvlan-net1`
-    network:
-
-    
-    ```
-    docker run -itd --name macvlan2 --network macvlan-net1 alpine:latest
-    ```
-    
-
-    This should start another container instance within the
-    `macvlan-net1` network.
-
-31. Run the `docker inspect` command to see the MAC address of
-    the `macvlan-net2` container instance:
-
-    
-    ```
-    docker inspect macvlan2
-    ```
-    
-
-    This will output the verbose configuration of the
-    `macvlan2` container instance in JSON format, truncated
-    here to only show the relevant networking settings:
-
-    
-![](./images/B15021_06_23.jpg)
-    
-
-
-
-    It can be seen in this output that the `macvlan2`
-    container has both a different IP address and MAC address from the
-    `macvlan1` container instance. Docker assigns different
-    MAC addresses to ensure that Layer 2 conflicts do not arise when
-    many containers are using `macvlan` networks.
-
-32. Run the `docker exec` command to access an `sh`
-    shell inside this container:
-
-    
-    ```
-    docker exec -it macvlan1 /bin/sh
-    ```
-    
-
-    This should drop you into a root session inside the container.
-
-33. Use the `ifconfig` command inside the container to observe
-    that the MAC address you saw in the `docker inspect`
-    output on the `macvlan1` container is present as the MAC
-    address of the container\'s primary network interface:
-
-    
-    ```
-    / # ifconfig
-    ```
-    
-
-    In the details for the `eth0` interface, look at the
-    `HWaddr` parameter. You may also note the IP address
-    listed under the `inet addr` parameter, as well as the
-    number of bytes transmitted and received by this network interface
-    -- `RX bytes` (bytes received) and `TX bytes`
-    (bytes transmitted):
-
-    
-    ```
-    eth0      Link encap:Ethernet  HWaddr 02:42:C0:A8:7A:02
-              inet addr:192.168.122.2  Bcast:192.168.122.255
-                                       Mask:255.255.255.0
-              UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
-              RX packets:353 errors:0 dropped:0 overruns:0 frame:0
-              TX packets:188 errors:0 dropped:0 overruns:0 carrier:0
-              collisions:0 txqueuelen:0 
-              RX bytes:1789983 (1.7 MiB)  TX bytes:12688 (12.3 KiB)
-    ```
-    
-
-34. Install the `arping` utility using the `apk`
-    package manager available in the Alpine Linux container. This is a
-    tool used to send `arp` messages to a MAC address to check
-    Layer 2 connectivity:
-
-    
-    ```
-    / # apk add arping
-    ```
-    
-
-    The `arping` utility should install inside the
-    `macvlan1` container:
-
-    
-    ```
-    fetch http://dl-cdn.alpinelinux.org/alpine/v3.11/main
-    /x86_64/APKINDEX.tar.gz
-    fetch http://dl-cdn.alpinelinux.org/alpine/v3.11/community
-    /x86_64/APKINDEX.tar.gz
-    (1/3) Installing libnet (1.1.6-r3)
-    (2/3) Installing libpcap (1.9.1-r0)
-    (3/3) Installing arping (2.20-r0)
-    Executing busybox-1.31.1-r9.trigger
-    OK: 6 MiB in 17 packages
-    ```
-    
-
-35. Specify the Layer 3 IP address of the `macvlan2` container
-    instance as the primary argument to `arping`. Now,
-    `arping` will automatically look up the MAC address and
-    check the Layer 2 connectivity to it:
-
-    
-    ```
-    / # arping 192.168.122.3
-    ```
-    
-
-    The `arping` utility should report back the correct MAC
-    address for the `macvlan2` container instance, indicating
-    successful Layer 2 network connectivity:
-
-    
-    ```
-    ARPING 192.168.122.3
-    42 bytes from 02:42:c0:a8:7a:03 (192.168.122.3): index=0 
-    time=8.563 usec
-    42 bytes from 02:42:c0:a8:7a:03 (192.168.122.3): index=1 
-    time=18.889 usec
-    42 bytes from 02:42:c0:a8:7a:03 (192.168.122.3): index=2 
-    time=15.917 use
-    type exit to return to the shell of your primary terminal. 
-    ```
-    
-
-36. Check the status of the containers using the
-    `docker ps -a` command:
-
-    
-    ```
-    docker ps -a 
-    ```
-    
-
-    The output of this command should show all the running and stopped
-    container instances in your environment.
 
 37. Next, stop all running containers using `docker stop`,
     followed by the container name or ID:
@@ -1782,9 +1229,8 @@ start with the `bridge` network and then look into the
     This command will clean up all unused container images, networks,
     and volumes remaining on your machine.
 
-In this exercise, we looked at the four default networking drivers
-available by default in Docker: `bridge`, `host`,
-`macvlan`, and `none`. For each example, we explored
+In this exercise, we looked at the default networking drivers
+available by default in Docker: `bridge`, `host` and `none`. For each example, we explored
 how the network functions, how containers deployed using these network
 drivers function with the host machine, and how they function with other
 containers on the network.

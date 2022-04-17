@@ -31,7 +31,7 @@ To ping www.google.com, you will craft a container called
 1.  Open the first terminal and execute the
     `docker container run` command to run a container. Use the
     `--name` option to give the container a specific
-    nickname---for example, `testevents`. Don\'t let the
+    nickname --- for example, `testevents`. Don\'t let the
     Docker host generate a random name for your container. Use the
     `ubuntu:14.04` image and the `ping google.com`
     command to verify that the server is running on the container:
@@ -354,15 +354,6 @@ To ping www.google.com, you will craft a container called
     indication that an error has been generated, and Docker was unable
     to get the container up and running.
 
-In this exercise, you explored the container life cycle and its
-different states. You also learned how to start with attachment by using
-the `docker container start -a <container name or ID>` command
-and how to stop the container using
-`docker container rm <container name or ID>`. In the end, we
-discussed how to force-remove running containers by using
-`docker container rm -f <container name or ID>`. Then, we saw
-the rare case of `CREATED`, which is shown only when the
-command generates an error and the container fails to start.
 
 So far, we have focused on the container\'s statuses and not its size.
 In the next exercise, we will learn how to determine the size of the
@@ -517,11 +508,6 @@ in troubleshooting and setting a maximum size for every container.
 Docker uses storage drivers to write in the writable layer. To find out what driver your operating system is using, run the
 `docker info` command.
 
-An understanding of Docker container life cycle events provides a good
-background when studying why some applications may or may not need
-persistent storage and outlines the default host storage area
-(filesystem location) for Docker before a container is explicitly
-removed.
 
 Now, let\'s delve into the stateful and stateless modes to decide which
 container needs persistent storage.
@@ -531,12 +517,6 @@ container needs persistent storage.
 
 Exercise 7.03: Creating and Scaling a Stateless Service, NGINX
 --------------------------------------------------------------
-
-Usually, in web-based applications, there is a frontend and a backend.
-For example, in the Panoramic Trekking application, you use NGINX in the
-frontend because it can handle a high volume of connections and
-distribute the loads to the slower database in the backend. Therefore,
-NGINX is used as the reverse proxy server and load balancer.
 
 In this exercise, you will focus on creating a stateless service, NGINX,
 solely, and see how easy it is to scale it. You will initialize a swarm
@@ -2255,7 +2235,6 @@ accessing the NGINX log files from the host.
 Summary
 =======
 
-
 This lab covered the life cycle of Docker containers and various
 events. It compared stateful and stateless applications and how each one
 saves its data. If we need the data to be persistent, we should use
@@ -2263,8 +2242,3 @@ volumes. The lab covered the creation and management of a volume. It
 further discussed the different types of volumes, as well as the
 difference between the usage of volumes and the filesystem, and how the
 data in both is affected when the container is committed to a new image.
-
-In the next lab, you will learn about the concepts of continuous
-integration and continuous delivery. You will learn how to integrate
-GitHub, Jenkins, Docker Hub, and SonarQube to publish your images
-automatically to the registry to be ready for production.
