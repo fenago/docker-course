@@ -1,5 +1,5 @@
-Managing Your Docker Images
-==============================
+Lab 3: Managing Your Docker Images
+==================================
 
 **Overview**
 

@@ -1,4 +1,4 @@
-FROM golang:latest AS builder
+FROM golang:1.15.6 AS builder
 WORKDIR /myapp
 COPY welcome.go .
 RUN go build -o welcome .

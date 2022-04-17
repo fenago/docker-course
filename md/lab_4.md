@@ -1,9 +1,5 @@
-Multi-Stage Dockerfiles
-==========================
-
-
-
-
+Lab 4: Multi-Stage Dockerfiles
+==============================
 
 Overview
 
@@ -11,154 +7,6 @@ In this lab, we will discuss a normal Docker build. You will review
 and practice `Dockerfile` best practices and learn to create
 and optimize the size of the Docker images using a builder pattern and
 multi-stage `Dockerfile`.
-
-
-Introduction
-============
-
-
-In the previous lab, we learned about Docker registries, including
-private and public registries. We created our own private Docker
-registry to store the Docker images. We also learned how to set up
-access and store our Docker images in the Docker Hub. In this lab,
-we will be discussing the concept of multi-stage
-`Dockerfiles`.
-
-Multi-stage `Dockerfiles` are a feature introduced in Docker
-version 17.05. This feature is preferable when we want to optimize
-Docker image size while running Docker images in production
-environments. To achieve this, a multi-stage `Dockerfile` will
-create multiple intermediate Docker images during the build process and
-selectively copy only essential artifacts from one stage to the other.
-
-Before multi-stage Docker builds were introduced, the builder pattern
-was used to optimize the Docker image size. Unlike multi-stage builds,
-the builder pattern needs two `Dockerfiles` and a shell script
-to create efficient Docker images.
-
-In this lab, we will first examine normal Docker builds and the
-problems associated with them. Next, we will learn how to use the
-builder pattern to optimize the Docker image size and discuss the
-problems associated with the builder pattern. Finally, we will learn to
-use multi-stage `Dockerfiles` to overcome the problems of the
-builder pattern.
-
-
-
-
-
-
-
-
-
-Normal Docker Builds
-====================
-
-
-With Docker, we can use `Dockerfiles` to create custom Docker
-images. As we discussed in *Lab 2, Getting Started with
-Dockerfiles*, a `Dockerfile` is a text file that contains
-instructions on how to create a Docker image. However, it is critical to
-have minimal-sized Docker images when running them in production
-environments. This allows developers to speed up their Docker
-containers\' build and deployment times. In this section, we will build
-a custom Docker image to observe the problems associated with the normal
-Docker build process.
-
-Consider an example where we build a simple Golang application. We are
-going to deploy a `hello world` application written in Golang
-using the following `Dockerfile`:
-
-
-```
-# Start from latest golang parent image
-FROM golang:1.15.6
-# Set the working directory
-WORKDIR /myapp
-# Copy source file from current directory to container
-COPY helloworld.go .
-# Build the application
-RUN go build -o helloworld .
-# Run the application
-ENTRYPOINT ["./helloworld"]
-```
-
-
-This `Dockerfile` starts with the latest Golang image as the
-parent image. This parent image contains all the build tools required to
-build our Golang application. Next, we will set the `/myapp`
-directory as the current working directory and copy the
-`helloworld.go` source file from the host filesystem to the
-container filesystem. Then, we will use the `RUN` directive to
-execute the `go build` command to build the application.
-Finally, the `ENTRYPOINT` directive is used to run the
-`helloworld` executable created in the previous step.
-
-The following is the content of the `helloworld.go` file. This
-is a simple file that will print the text `"Hello World"` when
-executed:
-
-
-```
-package main
-import "fmt"
-func main() {
-    fmt.Println("Hello World")
-}
-```
-
-
-Once the `Dockerfile` is ready, we can build the Docker image
-using the `docker image build` command. This image will be
-tagged as `helloworld:v1`:
-
-
-```
-docker image build -t helloworld:v1 .
-```
-
-
-Now, observe the built image with the `docker image ls`
-command. You will get an output similar to the following:
-
-
-```
-REPOSITORY   TAG   IMAGE ID       CREATED          SIZE
-helloworld   v1    23874f841e3e   10 seconds ago   805MB
-```
-
-
-Notice the image size. This build has resulted in a huge Docker image of
-805 MB in size. It is not efficient to have these large Docker images in
-production environments as they will take a lot of time and bandwidth to
-be pushed and pulled over networks. Small Docker images are much more
-efficient and can be pushed and pulled quickly and deployed faster.
-
-In addition to the size of the image, these Docker images can be
-vulnerable to attacks since they contain build tools that can have
-potential security vulnerabilities.
-
-Note
-
-Potential security vulnerabilities may vary depending on what packages
-are in the given Docker image. As an example, Java JDK has a number of
-vulnerabilities. You can have a detailed look at the vulnerabilities
-related to Java JDK at the following link:
-
-<https://www.cvedetails.com/vulnerability-list/vendor_id-93/product_id-19116/Oracle-JDK.html>.
-
-To reduce the attack surface, it is recommended to have only the
-essential artifacts (for example, compiled code) and runtimes when
-running Docker images in production environments. As an example, with
-Golang, the Go compiler is required to build the application, but not to
-run the application.
-
-Ideally, you want a minimal-sized Docker image that only contains the
-runtime tools and excludes all the build tools that we used to build the
-application.
-
-We will now build such a Docker image using the normal build process in
-the following exercise.
 
 
 
@@ -272,8 +120,6 @@ size of the final Docker image:
 ![](./images/15.png)
     
 
-    Figure 4.1: Building the Docker image
-
 10. Use the `docker image ls` command to list all the Docker
     images available on your computer:
 
@@ -289,8 +135,6 @@ size of the final Docker image:
 ![](./images/B15021_04_02.jpg)
     
 
-Figure 4.2: Listing all Docker images
-
 It can be observed in the preceding output that the image size of the
 `welcome:v1` image is `805MB`.
 
@@ -303,171 +147,6 @@ minimal-sized Docker images whenever possible. In the next section, we
 will discuss how we can use the builder pattern to optimize the
 image size.
 
-
-
-
-
-
-
-
-
-What Is the Builder Pattern?
-============================
-
-
-The **builder pattern** is a method used to create optimally sized
-Docker images. It uses two Docker images and selectively copies
-essential artifacts from one to the other. The first Docker image is
-known as the `build image` and is used as the build
-environment to build the executables from the source code. This Docker
-image contains compilers, build tools, and development dependencies
-required during the build process.
-
-The second Docker image is known as the `runtime image` and is
-used as the runtime environment to run the executables created by the
-first Docker container. This Docker image contains only the executables,
-the dependencies, and the runtime tools. A shell script is used to copy
-the artifacts using the `docker container cp` command.
-
-The entire process of building the image using the builder pattern
-consists of the following steps:
-
-1.  Create the `Build` Docker image.
-2.  Create a container from the `Build` Docker image.
-3.  Copy the artifacts from the `Build` Docker image to the
-    local filesystem.
-4.  Build the `Runtime` Docker image using copied artifacts:
-
-
-
-![](./images/B15021_04_03.jpg)
-
-
-
-Figure 4.3: Building images using the builder pattern
-
-As illustrated in the preceding image, the `Build`
-`Dockerfile` is used to create the build container that will
-contain all the tools required to build the source code, including
-compilers and build tools such as Maven, Gradle, and development
-dependencies. Once the build container is created, the shell script will
-copy the executables from the build container to the Docker host.
-Finally, the `Runtime` container will be created with the
-executables copied from the `Build` container.
-
-Now, observe how the builder pattern can be used to create minimal
-Docker images. The following is the first `Dockerfile` used to
-create the `Build` Docker container. This
-`Dockerfile` is named Dockerfile.build to distinguish it from
-the `Runtime` `Dockerfile`:
-
-
-```
-# Start from latest golang parent image
-FROM golang:1.15.6
-# Set the working directory
-WORKDIR /myapp
-# Copy source file from current directory to container
-COPY helloworld.go .
-# Build the application
-RUN go build -o helloworld .
-# Run the application
-ENTRYPOINT ["./helloworld"]
-```
-
-
-This is the same `Dockerfile` that we observed with the normal
-Docker builds. This was used to create the `helloworld`
-executable from the `helloworld.go` source file.
-
-The following is the second `Dockerfile` used to build the
-`Runtime` Docker container:
-
-
-```
-# Start from latest alpine parent image
-FROM alpine:latest
-# Set the working directory
-WORKDIR /myapp
-# Copy helloworld app from current directory to container
-COPY helloworld .
-# Run the application
-ENTRYPOINT ["./helloworld"]
-```
-
-
-As opposed to the first `Dockerfile`, created from the
-`golang` parent image, this second `Dockerfile` uses
-the `alpine` image as its parent image because it is a
-minimal-sized Docker image, at only 5 MB. This image uses Alpine Linux,
-a lightweight Linux distribution. Next, the `/myapp` directory
-is configured as the working directory. Finally, the
-`helloworld` artifact is copied to the Docker image, and the
-`ENTRYPOINT` directive is used to run the application.
-
-This `helloworld` artifact is the result of the
-`go build -o helloworld .` command executed in the first
-`Dockerfile`. We will be using a shell script to copy this
-artifact from the `build` Docker container to the local
-filesystem, from where this artifact will be copied to the runtime
-Docker image.
-
-Consider the following shell script used to copy the build artifacts
-between Docker containers:
-
-
-```
-#!/bin/sh
-# Build the builder Docker image 
-docker image build -t helloworld-build -f Dockerfile.build .
-# Create container from the build Docker image
-docker container create --name helloworld-build-container   helloworld-build
-# Copy build artifacts from build container to the local filesystem
-docker container cp helloworld-build-container:/myapp/helloworld .
-# Build the runtime Docker image
-docker image build -t helloworld .
-# Remove the build Docker container
-docker container rm -f helloworld-build-container
-# Remove the copied artifact
-rm helloworld
-```
-
-
-This shell script will first build the `helloworld-build`
-Docker image using the `Dockerfile.build` file. The next step
-is to create a Docker container from the `helloworld-build`
-image so that we can copy the `helloworld` artifact to the
-Docker host. Once the container is created, we need to execute the
-command to copy the `helloworld` artifact from the
-`helloworld-build-container` to the current directory of the
-Docker host. Now, we can build the runtime container with the
-`docker image build` command. Finally, we will execute the
-necessary cleanup tasks by removing the intermediate artifacts, such as
-the `helloworld-build-container` container and the
-`helloworld` executable.
-
-Once we execute the shell script, we should be able to see two Docker
-images:
-
-
-```
-REPOSITORY         TAG      IMAGE ID       CREATED       SIZE
-helloworld         latest   faff247e2b35   3 hours ago   7.6MB
-helloworld-build   latest   f8c10c5bd28d   3 hours ago   805MB
-```
-
-
-Note the size difference between the two Docker images. The
-`helloworld` Docker image is only 7.6 MB in size, which is a
-huge reduction from the `helloworld-build` image at 805 MB.
-
-As we can see, the builder pattern can drastically reduce the size of
-the Docker images by copying only the essential artifacts to the final
-image. However, the disadvantage with the builder pattern is that we
-need to maintain two `Dockerfiles` and a shell script.
-
-In the next exercise, we will gain hands-on experience in creating an
-optimized Docker image using the builder pattern.
 
 
 
@@ -668,7 +347,7 @@ exercise, you will optimize the Docker image using the builder pattern:
 ![](./images/B15021_04_04.jpg)
     
 
-    Figure 4.4: Building the Docker image
+
 
 17. Use the `docker image` ls command to list all the Docker
     images available on your computer:
@@ -686,8 +365,6 @@ exercise, you will optimize the Docker image using the builder pattern:
 ![](./images/B15021_04_05.jpg)
     
 
-Figure 4.5: Listing all Docker images
-
 As you can see from the preceding output, there are two Docker images
 available. welcome-builder has all the builds tools and is 805 MB, while
 welcome-runtime has a significantly lower image size of 2.01 MB.
@@ -700,12 +377,6 @@ optimize the size of the Docker image means that we have to maintain two
 `Dockerfiles` and one shell script. In the next section,
 let\'s observe how we can eliminate them by using a
 multi-stage `Dockerfile`.
-
-
-
-
-
-
 
 
 
@@ -993,8 +664,6 @@ process. In this exercise, you are going to use a multi-stage
 ![](./images/B15021_04_06.jpg)
     
 
-    Figure 4.6: Building the Docker image
-
 9.  Use the `docker image ls` command to list all the Docker
     images available on your computer. These images are available on
     your computer, either when you pull them from Docker Registry or
@@ -1015,8 +684,6 @@ process. In this exercise, you are going to use a multi-stage
 ![](./images/B15021_04_07.jpg)
     
 
-Figure 4.7: Listing all Docker images
-
 In this exercise, you learned how to use multi-stage
 `Dockerfiles` to build optimized Docker images. The following
 table presents a summary of the key differences between the builder
@@ -1024,291 +691,7 @@ pattern and multi-stage `Docker Builds`:
 
 
 
-![Figure 4.8: Differences between the builder pattern and multi-stage
-Docker Builds ](./images/B15021_04_08.jpg)
-
-
-
-Figure 4.8: Differences between the builder pattern and multi-stage
-Docker Builds
-
-In the next section, we will review the best practices to follow when
-writing a `Dockerfile`.
-
-
-
-
-
-
-
-
-
-Dockerfile Best Practices
-=========================
-
-
-In the previous section, we discussed how we can build an efficient
-Docker image with multi-stage `Dockerfiles`. In this section,
-we will cover other recommended best practices for writing
-`Dockerfiles`. These best practices will ensure reduced build
-time, reduced image size, increased security, and increased
-maintainability of the Docker images produced.
-
-
-
-Using an Appropriate Parent Image
----------------------------------
-
-Using the appropriate base image is one of the key recommendations when
-building efficient Docker images.
-
-It is always encouraged to use official images from the **Docker Hub**
-as the parent image when you are building custom Docker images. These
-official images will ensure that all best practices are followed,
-documentation is available, and security patches are applied. For
-example, if you need the **JDK** (**Java Development Kit**) for your
-application, you can use the `openjdk` official Docker image
-instead of using the generic `ubuntu` image and installing the
-JDK on top of the `ubuntu` image:
-
-
-
-![](./images/B15021_04_09.jpg)
-
-
-
-Figure 4.9: Using appropriate parent images
-
-Secondly, avoid using the `latest` tag for the parent image
-when building Docker images for production environments. The
-`latest` tag might get pointed to a newer version of the image
-as the new versions are released to the Docker Hub, and the newer
-version might not be backward compatible with your applications, leading
-to failures in your production environments. Instead, the best practice
-is to always use a specific versioned tag as the parent image:
-
-
-
-![](./images/B15021_04_10.jpg)
-
-
-
-Figure 4.10: Avoiding the use of the latest tag of the parent image
-
-Finally, using the minimal version of the parent image is critical to
-getting a minimal-sized Docker image. Most of the official Docker images
-in Docker Hub have a minimal-sized image built around the Alpine Linux
-image. Also, in our example, we can use the **JRE** (**Java Runtime
-Environment**) to run the application instead of the JDK, which contains
-the build tools:
-
-
-
-![](./images/B15021_04_11.jpg)
-
-
-
-Figure 4.11: Using minimal-sized images
-
-The `openjdk:8-jre-alpine` image will be only 84.9 MB in size,
-whereas `openjdk:8` will be 488 MB in size.
-
-
-
-Using a Non-Root User for Better Security
------------------------------------------
-
-By default, Docker containers run with the root (`id = 0`)
-user. This allows the user to perform all the necessary administrative
-activities, such as changing system configurations, installing packages,
-and binding to privileged ports. However, this is high risk and is
-considered a bad security practice when running Docker containers in
-production environments since hackers can gain root access to the Docker
-host by hacking the applications running inside the Docker container.
-
-Running containers as a non-root user is a recommended best practice to
-improve the security of the Docker container. This will adhere to the
-principle of least privilege, which ensures that the application has
-only the bare minimum privileges to perform its tasks. There are two
-methods that we can use to run a container as a non-root user: with the
-`--user` (or `-u`) flag, and with the
-`USER` directive.
-
-Using the `--user` (or `-u`) flag with the
-`docker run` command is one method for changing the default
-user while running a Docker container. Either the username or the user
-ID can be specified with the `--user` (or `-u`)
-flag:
-
-
-```
-docker run --user=9999 ubuntu:focal
-```
-
-
-In the preceding command, we have specified the user ID as
-`9999`. If we are specifying the user as an ID, the
-corresponding user does not have to be available in the Docker
-container.
-
-Additionally, we can use the `USER` directive within the
-`Dockerfile` to define the default user. However, this value
-can be overridden with the `--user` flag while starting the
-Docker container:
-
-
-```
-FROM ubuntu:focal
-RUN apt-get update 
-RUN useradd demo-user
-USER demo-user
-CMD whoami
-```
-
-
-In the preceding example, we have used the `USER` directive to
-set the default user to `demo-user`. This means that any
-command after the `USER` directive will be executed as a
-`demo-user`.
-
-
-
-Using dockerignore
-------------------
-
-The `.dockerignore` file is a special text file within the
-Docker context that is used to specify a list of files to be excluded
-from the Docker context while building the Docker image. Once we execute
-the `docker build` command, the Docker client will package the
-entire build context as a TAR archive and upload it to the Docker
-daemon. When we execute the `docker build` command, the first
-line of the output is
-`Sending build context to Docker daemon`, which indicates that
-the Docker client is uploading the build context to the Docker daemon:
-
-
-```
-Sending build context to Docker daemon  18.6MB
-Step 1/5 : FROM ubuntu:focal
-```
-
-
-Each time we build the Docker image, the build context will be sent to
-the Docker daemon. As this will take time and bandwidth during the
-Docker image build process, it is recommended to exclude all the files
-that are not needed in the final Docker image. The
-`.dockerignore` file can be used to achieve this purpose. In
-addition to saving time and bandwidth, the `.dockerignore`
-file is used to exclude the confidential files, such as password files
-and key files from the build context.
-
-The `.dockerignore` file should be created in the root
-directory of the build context. Before sending the build context to the
-Docker daemon, the Docker client will look for the
-`.dockerignore` file in the root of the build context. If the
-`.dockerignore` file exists, the Docker client will exclude
-all the files mentioned in the `.dockerignore` file from the
-build context.
-
-The following is the content of a sample `.dockerignore` file:
-
-
-```
-PASSWORDS.txt
-tmp/
-*.md
-!README.md
-```
-
-
-In the preceding example, we have specifically excluded the
-`PASSWORDS.txt` file and `tmp` directory from the
-build context, as well as all files with the `.md` extension
-except for the `README.md` file.
-
-
-
-Minimizing Layers
------------------
-
-Each line in the `Dockerfile` will create a new layer that
-will take up space in the Docker image. So, it is recommended to create
-as few layers as possible when building the Docker image. To achieve
-this, combine the `RUN` directives whenever possible.
-
-As an example, consider the following `Dockerfile`, which will
-update the package repository first and then install the
-`redis-server` and `nginx` packages:
-
-
-```
-FROM ubuntu:focal
-RUN apt-get update
-RUN apt-get install -y nginx
-RUN apt-get install -y redis-server
-```
-
-
-This `Dockerfile` can be optimized by combining the three
-`RUN` directives:
-
-
-```
-FROM ubuntu:focal
-RUN apt-get update \
-  && apt-get install -y nginx redis-server
-```
-
-
-
-
-Don\'t Install Unnecessary Tools
---------------------------------
-
-Not installing unnecessary debugging tools (such as
-`vim`, `curl`, and `telnet`) and removing
-unnecessary dependencies can help to create efficient Docker images that
-are small in size. Some package managers such as `apt` will
-install recommended and suggested packages automatically alongside
-required packages. We can avoid this by specifying the
-`no-install-recommends` flag with the
-`apt-get install` command:
-
-
-```
-FROM ubuntu:focal
-RUN apt-get update \
-  && apt-get install --no-install-recommends -y nginx 
-```
-
-
-In the preceding example, we are installing the
-`nginx` package with the `no-install-recommends`
-flag, which will help to reduce the final image size by around 10 MB.
-
-In addition to using the
-`no-install-recommends` flag, we can also remove the cache of
-the `apt` package manager to further reduce the final Docker
-image size. This can be achieved by running
-`rm -rf /var/lib/apt/lists/*` at the end of the
-`apt-get install` command:
-
-
-```
-FROM ubuntu:focal
-RUN apt-get update \
-    && apt-get install --no-install-recommends -y nginx \
-    && rm -rf /var/lib/apt/lists/*
-```
-
-
-In this section, we discussed the best practices
-when writing a `Dockerfile`. Following these best practices
-will help to reduce build time, reduce the image size, increase
-security, and increase the maintainability of the Docker image.
-
-Now, let\'s test our knowledge by deploying a Golang HTTP server with a
-multi-stage Docker build in the next activity.
+![](./images/B15021_04_08.jpg)
 
 
 
@@ -1329,7 +712,7 @@ invoke URL:
 
 
 
-Figure 4.12: Responses based on the invoke URL
+
 
 Your task is to dockerize the Golang application given in the following
 code block using a multi-stage `Dockerfile`:

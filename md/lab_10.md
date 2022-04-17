@@ -1,11 +1,6 @@
-Best Practices
-==================
+Lab 10: Best Practices
+======================
 
-
-
-
-
-Overview
 
 In this lab, you will learn some of the best practices to use when
 working with Docker and your container images. This will enable you to
@@ -20,156 +15,8 @@ files before your applications and containers are running with the help
 of `hadolint's` `FROM:latest` command and
 `dcvalidator`.
 
-
-
-
-
-
-
-
-
-Introduction
-============
-
-
-The previous lab on security covered some best practices for Docker
-images and services that have adhered to these best practices. We made
-sure that our images and services were secure and that they limited what
-could be achieved if an attacker was able to access the image. This
-lab will not only take you through the best practices in creating
-and running our Docker images, but will also focus on container
-performance, configuring our services, and ensuring that the services
-running on them are running as efficiently as possible.
-
-We will start this lab with an in-depth look at how you can both
-monitor and configure the resources being used by your services, such as
-memory and CPU usage. We will then take you through some important
-practices that you can implement in your projects, looking at how you
-create your Docker images and the applications that are running on them.
-Lastly, this lab will give you some practical tools to use to test
-your `Dockerfiles` and `docker-compose.yml` files,
-which will serve as a way to ensure that you are following the mentioned
-practices.
-
-This lab shows how you can ensure that you optimize your services
-and containers as much as possible to make sure that they run without
-issues from your development environment through to production. The goal
-of this lab is to make sure that your services are starting up as
-quickly as possible and are processing as efficiently as they can. The
-practices mentioned in this lab also ensure reusability (that is,
-they make sure that anyone who wants to reuse your images or code can do
-so and can understand specifically what is happening at all times). To
-begin with, the following section discusses how to work with container
-resources.
-
-
-
-
-
-
-
-
-
-Working with Container Resources
-================================
-
-
-One of the main benefits of moving to Docker from a traditional server
-environment is that it enables us to heavily reduce the footprint of our
-services and applications, even when moving to production. This doesn\'t
-mean we can simply run anything on our container, expecting all the
-processes to simply complete their execution, however. Just as we would
-need resources with a service running on a standalone server, we need to
-ensure that the resources (such as CPU, memory, and disk input and
-output) that are being used by our containers do not cause our
-production environments or any other containers to crash. By monitoring
-the resources used in our development system, we can help optimize
-processes and ensure that the end-user is experiencing seamless
-operation when we move it into production.
-
-By testing our services and monitoring resource usage, we will be able
-to understand the resources required by the running applications and
-ensure that the hosts running our Docker images have adequate resources
-to run our service. Lastly, as you will see in the upcoming sections, we
-can also limit the amount of CPU and memory resources the container can
-have access to. When developing our services running on Docker, we need
-to be testing these services on our development system to know exactly
-what will happen when they are moved into test and
-production environments.
-
-When we bring a number of different services (such as a database, web
-server, and API gateway) together to create an application, some
-services are more important than others, and in some circumstances,
-these services may need to have more resources allocated to them.
-However, in Docker, the running container does not have a real limit on
-the resources it can use by default.
-
-In previous chapters, we learned about orchestration using Swarm and
-Kubernetes, which helps in distributing resources across your system,
-but this part of the lab will teach you about some basic tools to
-test and monitor your resources with. We will also look at the ways in
-which you can configure your containers to no longer use the default
-resources available.
-
-To help us in this part of the lab, we are going to create a new
-image that will only serve the purpose of demonstrating resource usage
-in our system. In the first part of this section, we will create an
-image that will add an application called stress. The main function of
-the stress application is to impose a heavy load on our system. The
-image will allow us to view the resources being used on our host system
-and then allow us to use different options when running the Docker image
-to limit the resources being used.
-
-Note
-
-This section of the lab will give you some brief guidelines on
-monitoring the resources of our running Docker containers. This lab
-will only cover some simple concepts as we are going to be dedicating an
-entire lab of this book to providing in-depth details on monitoring
-your container metrics.
-
-To help us view the resources being consumed by our running containers,
-Docker provides the `stats` command as a live stream of
-resources being consumed by our running containers. If you wish to limit
-the data presented by the stream, especially if you have a large number
-of containers running, you can specify to only provide certain
-containers by specifying the name of the container or its ID:
-
-
-```
-docker stats <container_name|container_id>
-```
-
-
-The default output of the `docker` `stats` command
-will provide you with the name and ID of the container, the percentage
-of host CPU and memory that the container is using, the data that the
-container is sending and receiving, and the amount of data both read and
-written from the host\'s storage:
-
-
-```
-NAME                CONTAINER           CPU %
-docker-stress       c8cf5ad9b6eb        400.43%
-```
-
-
-The following section will highlight how we can use the
-`docker stats` command to monitor our resources. We will also
-provide format controls to the `stats` command to provide only
-the information we need.
-
-
-
-
-
-
-
-
-
 Managing Container CPU Resources
 ================================
-
 
 This section of the lab will show you how to set limits on the
 amount of CPU being used by the container, as a container running
@@ -178,91 +25,6 @@ server. We will be looking at optimizing our running Docker container,
 but the actual issue with a large amount of CPU being used usually lies
 with the underlying infrastructure or the applications running on the
 container.
-
-When we discuss CPU resources, we usually refer to a single physical
-computer chip. These days, a CPU will most likely have more than one
-core, with more cores meaning more processes. But this doesn\'t mean we
-have unlimited resources. When we display the CPU percentage being used,
-unless you have a system that only has one CPU with one core, you will
-most likely see more than 100% of the CPU being used. For example, if
-you have four cores in the CPU of your system, and your container is
-utilizing all of the CPU, you will see a value of 400%
-
-We can modify the `docker stats` command running on our system
-to only provide the CPU usage details by providing the
-`--format` option. This option allows us to specify the output
-format we require, as we may only require one or two of the metrics
-provided by the `stats` command. The following example
-configures the output of the `stats` command to be displayed
-in a `table` format, only presenting the container\'s name,
-its ID, and the percentage of CPU being used:
-
-
-```
-docker stats --format "table {{.Name}}\t{{.Container}}\t{{.CPUPerc}}"
-```
-
-
-This command, if we have no Docker images running, will provide a table
-with the following three columns:
-
-
-```
-NAME                CONTAINER           CPU %
-```
-
-
-To control the number of cores being used on the CPU by our running
-container, we can use the `--cpus` option with our
-`docker run` command. The following syntax shows us running
-the image, but limiting the number of cores the image will have access
-to by using the `--cpus` option:
-
-
-```
-docker run --cpus 2 <docker-image>
-```
-
-
-A better option is not to set the number of cores a container can use,
-but instead how much of the total it can share. Docker provides the
-`--cpushares`, or `-c`, option to set a priority to
-how much of the processing power a container can use. By using this
-option, it means we don\'t need to know how many cores the host machine
-has before running the container. It also means that we can transfer the
-running container to different host systems without needing to change
-the command the image is run with.
-
-By default, Docker will allocate 1,024 shares to every running
-container. If you set the `--cpushares` value to
-`256`, it would have a quarter of the processing shares of
-other running containers:
-
-
-```
-docker run --cpushares 256 <docker-image>
-```
-
-
-Note
-
-If no other containers are running on your system, even if you have set
-the `--cpushares` value to `256`, the container will
-then be allowed to use up the remaining processing power.
-
-Even though your application may be running fine, it\'s always good
-practice to see how it will work when you reduce the amount of CPU it
-has available to it, as well as seeing how much it will consume while it
-is running normally.
-
-In the next exercise, we will use the `stress` application to
-monitor the resource usage on the system.
-
-Note
-
-Please use `touch` command to create files and `vim`
-command to work on the file using vim editor.
-
 
 
 Exercise 12.01: Understanding CPU Resources on Your Docker Image
@@ -522,125 +284,12 @@ monitoring and configuration changes on our container\'s memory.
 
 
 
-
-
-
-
-
-
 Managing Container Memory Resources
 ===================================
 
 
-Just as we can monitor and control the CPU resources our container is
-using on our system, we can also do the same with the memory being used.
-As with CPU, the running container is able to use all of the host\'s
-memory with the default settings provided by Docker, and in some cases
-can cause the system to become unstable if it is not limited. If the
-host systems kernel detects that there is not enough memory available,
-it will show an **out-of-memory exception** and start to kill off the
-processes on the system to help free up memory.
-
-The good news is that the Docker daemon has a high priority on your
-system, so the kernel will first kill off running containers before it
-stops the Docker daemon from running. This means that your system should
-be able to recover if the high memory usage is being caused by a
-container application.
-
-Note
-
-If your running containers are being shut down, you will also need to
-make sure you have tested your application to ensure that you are
-limiting the impact it is having on your running processes.
-
-Once again, the `docker stats` command gives us quite a bit of
-information on memory usage. It will output the percentage of the memory
-the container is using as well as the current memory being used compared
-with the total amount of memory it is able to use. As we did previously,
-we can restrict the output presented with the `--format`
-option. In the following command, we are reducing the output provided by
-only displaying the container name and ID, as well as the memory
-percentage and memory usage, via the `.Name`,
-`.Container`, `.MemPerc`, and `.MemUsage`
-attributes, respectively:
-
-
-```
-docker stats --format "table {{.Name}}\t{{.Container}}\t{{.MemPerc}}\t{{.MemUsage}}"
-```
-
-
-With no containers running, the preceding command will show the
-following output:
-
-
-```
-NAME         CONTAINER          MEM %         MEM USAGE / LIMIT
-```
-
-
-If we want to limit or control the amount of memory being used by our
-running container, there are a few options available to us. One of the
-options available is the `--memory`, or `-m`,
-option, which will set a limit for the amount of memory a running
-container can use. In the following example, we have used a syntax of
-`--memory 512MB` to limit the amount of memory available to
-the image to `512MB`:
-
-
-```
-docker run --memory 512MB <docker-image>
-```
-
-
-If the host system that the container is running on is also using swap
-space as part of its available memory, you can also assign memory from
-that container to be run as swap. This is simply done by using the
-`--memory-swap` option. This can only be used in conjunction
-with the `--memory` option, as we have demonstrated in the
-following example. We have set the `--memory-swap` option as
-`1024MB`, which is the total amount of memory available to the
-container of both memory and swap memory. So, in our example, there will
-be a further `512MB` available in the swap:
-
-
-```
-docker run --memory 512MB --memory-swap 1024MB <docker-image>
-```
-
-
-You need to remember, though, that swap memory will be assigned to disk,
-so as a consequence, it will be slower and less responsive than RAM.
-
-Note
-
-The `--memory-swap` option needs to be set to a number higher
-than the `--memory` option. If it is set to the same number,
-you will not be able to assign any memory from that running container to
-swap.
-
-Another option available, and only to be used if you need to ensure the
-availability of the running container at all times, is the
-`--oom-kill-disable` option. This option stops the kernel from
-killing the running container if the host system runs too low on memory.
-This should only be used together with the `--memory` option
-to ensure that you set a limit to the memory available to the container.
-Without a limit, the `--oom-kill-disable` option could easily
-use all the memory on the host system:
-
-
-```
-docker run --memory 512MB --oom-kill-disable <docker-image>
-```
-
-
-Even though your applications will be well designed, the preceding
-configurations give you some options to control the amount of memory
-being used by your running containers.
-
 The next section will provide you with hands-on experience in analyzing
 the memory resources on your Docker image.
-
 
 
 Exercise 12.02: Analyzing Memory Resources on Your Docker Image
@@ -815,16 +464,7 @@ and write resources on our host system disks.
 Managing the Container Disk\'s Read and Write Resources
 =======================================================
 
-
-The CPU and memory consumed by a running container are usually the
-biggest culprits for an environment running poorly, but there could also
-be an issue with your running containers trying to read or write too
-much to the host\'s disk drive. This would most likely have less impact
-than CPU or memory issues, but if there was a large amount of data being
-transferred to the host system\'s drives, it could still cause
-contention and slow your services down.
-
-Fortunately, Docker also provides us with a way to control the amount of
+Docker also provides us with a way to control the amount of
 reading and writing that our running containers can perform. Just as
 we\'ve seen previously, we can use a number of options with our
 `docker run` command to limit the amount of data we are either
@@ -834,76 +474,7 @@ The `docker stats` command also allows us to see the data
 being transferred to and from our running container. It has a dedicated
 column that can be added to our table using the `BlockIO`
 value in our `docker stats` command, which represents the read
-and writes to our host disk drive or directories:
-
-
-```
-docker stats --format "table {{.Name}}\t{{.Container}}\t{{.BlockIO}}"
-```
-
-
-If we don\'t have any running containers on our system, the preceding
-command should provide us with the following output:
-
-
-```
-NAME                CONTAINER           BLOCK I/O
-```
-
-
-If we ever need to limit the amount of data that a running container can
-move to our host system\'s disk storage, we can start by using the
-`--blkio-weight` option with our `docker run`
-command. This option stands for **Block Input Output Weight** and allows
-us to set a relative weight for the container to be between
-`10` and `1000` and is relative to all the other
-containers running on your system. All containers will be set with the
-same proportion of bandwidth, which is 500. If a value of 0 is provided
-to any container, this option will be switched off:
-
-
-```
-docker run --blkio-weight <value> <docker-image>
-```
-
-
-The next option we have available to use is
-`--device-write-bps`, which will limit the specific write
-bandwidth available to the device specified with a bytes-per-second
-value. The specific device is relative to the device the container is
-using on the host system. This option also has an
-`iops (Input/Output) per seconds` option that can also be
-used. The following syntax provides the basic usage of the option where
-the limit value is a numeric value set as MB:
-
-
-```
-docker run --device-write-bps <device>:<limit> <docker-image>
-```
-
-
-Just as there is a way to limit write processes to the host system\'s
-disk, there is also an option to limit the read throughput available.
-Once again, it also has an `iops (Input/Output) per seconds`
-option that can be used and will limit the amount of data that can be
-read from your running container. The following example uses the
-`--device-read-bps` option as part of the
-`docker run` command:
-
-
-```
-docker run --device-read-bps <device>:<limit> <docker-image>
-```
-
-
-If you\'re adhering to container best practices, overconsumption of disk
-input or output should not be too much of an issue. There is no reason
-to assume that this will not cause you any problems, though. Just as you
-have worked with both CPU and memory, your disk input and output should
-be tested on your running containers before your services are
-implemented in production.
-
-
+and writes to our host disk drive or directories.
 
 Exercise 12.03: Understanding Disk Read and Write
 -------------------------------------------------
@@ -1785,12 +1356,7 @@ the warnings we receive:
     details to the user:
 
     
-    ![Figure 12.1: A screenshot of the FROM:latest website with a sample
-    Dockerfile entered ](./images/B15021_12_01.jpg)
-    
-
-    Figure 12.1: A screenshot of the FROM:latest website with a sample
-    Dockerfile entered
+    ![](./images/B15021_12_01.jpg)
 
 9.  As in the previous part of this exercise, we will use the
     `Dockerfile` from our `docker-stress` image. To
@@ -1816,7 +1382,6 @@ the warnings we receive:
 ![](./images/B15021_12_02.jpg)
     
 
-Figure 12.2: The Dockerfile entered for our docker-stress image
 
 Both `hadolint` and `FROM latest` provide
 easy-to-use options to help you make sure your `Dockerfiles`
@@ -1979,8 +1544,7 @@ required before starting:
 7.  You\'ll remember that we used a `docker-compose` file to
     install the Anchore image scanner. When you have the URL location of
     the `compose` file, use the `-u` option to pass
-    the URL for the file to be validated. In this instance, it is on the
-    Packt GitHub account:
+    the URL for the file to be validated. In this instance, it is on the GitHub account:
 
     
     ```
@@ -2021,80 +1585,10 @@ the end of this part of the lab where we have been using some
 automated processes and applications to validate and lint our
 `Dockerfiles` and `docker-compose.yml` file.
 
-Now, let\'s move on to the activities, which will help you test your
-understanding of the lab. In the following activity, you will view
-the resources used by one of the services running on the Panoramic
-Trekking App.
-
-
-
-Activity 12.01: Viewing the Resources Used by the Panoramic Trekking App
-------------------------------------------------------------------------
-
-Earlier in this lab, we looked at how our running container consumed
-resources on our host system. In this activity, you will choose one of
-the services running on the Panoramic Trekking App, run the container
-with its default configurations, and see what CPU and memory resources
-it uses. Then, run the container again with changes to the CPU and
-memory configurations to see how this affects the resource usage:
-
-The general set of steps you\'ll need to complete this activity runs as
-follows:
-
-1.  Decide on a service in the Panoramic Trekking App that you would
-    like to test.
-
-2.  Create a set of tests that you can use to then measure the resource
-    usage of the service.
-
-3.  Start your service and monitor the resource usage using the tests
-    you created in the previous step.
-
-4.  Stop your service from running and run it again, this time with
-    changes to the CPU and memory configurations.
-
-5.  Monitor the resource usage again using the tests you created in
-    *step 2* and compare the changes in resource usage.
-
-
-The next activity will help you use `hadolint` on your
-`Dockerfiles` to improve the best practices.
-
-
-
-Activity 12.02: Using hadolint to Improve the Best Practices on Dockerfiles
----------------------------------------------------------------------------
-
-`hadolint` provides a great way to enforce best practices when
-you are creating your Docker images. In this activity, you will once
-again use the `Dockerfile` from the `docker-stress`
-image to see whether you can use the recommendations from
-`hadolint` to improve the `Dockerfile` so that it
-adheres to best practices as much as possible.
-
-The steps you\'ll need to complete this activity are as follows:
-
-1.  Ensure you have the `hadolint` image available and running
-    on your system.
-2.  Run the `hadolint` image over the `Dockerfile`
-    for the `docker-stress` image and record the results.
-3.  Make the recommended changes to the `Dockerfile` from the
-    previous step.
-4.  Test the `Dockerfile` again.
-
-You should get the following output on the successful completion of the
-activity:
-
-
-
-![](./images/B15021_12_03.jpg)
-
-
 
 
 Summary
 =======
-
 
 This lab has seen us go through a lot of theory as well as some
 in-depth work on exercises. We started the lab by looking at how our
@@ -2111,7 +1605,3 @@ to help you enforce these best practices, including `hadolint`
 and `FROM:latest` to help you lint your
 `Dockerfiles`, and `dcvalidator` to check over your
 `docker-compose.yml` files.
-
-The next lab takes our monitoring skills up another level as we
-introduce using Prometheus to monitor our container metrics and
-resources.

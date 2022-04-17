@@ -1,11 +1,5 @@
-Composing Environments with Docker Compose
-=============================================
-
-
-
-
-
-Overview
+Lab 5: Composing Environments with Docker Compose
+=================================================
 
 This lab covers the creation and management of multi-container
 applications using Docker Compose. You will learn how to create Docker
@@ -19,110 +13,11 @@ dependencies on other applications.
 
 
 
-
-
-
-
-Introduction
-============
-
-
-In the previous chapters, we discussed how to use Docker containers and
-`Dockerfiles` to create containerized applications. As apps
-get more complicated, the management of the containers and their
-configurations becomes more involved.
-
-For example, imagine you are developing an online shop with frontend,
-backend, payment, and ordering microservices. Each microservice is
-implemented with the most appropriate programming language before being
-built, packaged, and configured. Thus, complex applications are designed
-to run in separate containers in the Docker ecosystem. Different
-containers require multiple `Dockerfiles` to define Docker
-images.
-
-They also need complex commands to configure, run, and troubleshoot
-applications. All this can be achieved using **Docker Compose**, a tool
-for defining and managing applications in multiple containers. Complex
-applications such as YAML files can be configured and run with a single
-command in Docker Compose. It is suitable for various environments,
-including development, testing, **Continuous Integration** (**CI**)
-pipelines, and production.
-
-The essential features of Docker Compose can be grouped into three
-categories:
-
--   **Isolation**: Docker Compose allows you to run multiple instances
-    of your complex application in complete isolation. Although it seems
-    like a trivial feature, it makes it possible to run multiple copies
-    of the same application stack on developer machines, CI servers, or
-    shared hosts. Therefore, sharing resources increases utilization
-    while decreasing operational complexity.
--   **Stateful data management**: Docker Compose manages the volumes of
-    your containers so that they do not lose their data from previous
-    runs. This feature makes it easier to create and operate
-    applications that store their state on disks, such as databases.
--   **Iterative design**: Docker Compose works with an explicitly
-    defined configuration that consists of multiple containers. The
-    containers in the configuration can be extended with new containers.
-    For instance, imagine you have two containers in your application.
-    If you add a third container and run Docker Compose commands, the
-    first two containers will not be restarted or recreated. Docker
-    Compose will only create and join the newly added third container.
-
-These features make Compose an essential tool for creating and managing
-applications as multiple containers in various platforms. In this
-lab, you will see how Docker Compose helps you to manage the
-complete life cycle of complicated applications.
-
-You will start by diving deep into Compose CLI and file anatomy.
-Following this, you will learn how to configure applications with
-multiple techniques and how to define service dependencies. Since Docker
-Compose is an essential tool for the Docker environment, both technical
-and hands-on experience are vital to have in your toolbox.
-
-
-
-
-
-
-
-
-
 Docker Compose CLI
 ==================
 
 
-Docker Compose works with **Docker Engine** to create and manage
-multi-container applications. To interact with Docker Engine, Compose
-uses a CLI tool named `docker-compose`. On Mac and Windows
-systems, `docker-compose` is already a part of Docker Desktop.
-However, on Linux systems, you need to install the
-`docker-compose` CLI tool after installing Docker Engine. It
-is packaged into a single executable, and you can install it with the
-following commands on Linux systems.
-
-
-
-Installing Docker Compose CLI in Linux
---------------------------------------
-
-1.  Download the binary to `/usr/local/bin` with the following
-    command in your Terminal:
-    
-    ```
-    sudo curl -L "https://github.com/docker/compose/releases/download/1.25.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-    ```
-    
-
-2.  Make the downloaded binary executable with the following command:
-    
-    ```
-    sudo chmod +x /usr/local/bin/docker-compose
-    ```
-    
-
-3.  Test the CLI and installation with the following command in the
-    Terminal on all operating systems:
+Test the CLI and installation with the following command in the terminal on all operating systems:
 
     
     ```
@@ -133,20 +28,12 @@ Installing Docker Compose CLI in Linux
     If it is installed correctly, you will see the versions of the CLI
     and its dependencies as follows. For instance, in the following
     output, the `docker-compose` CLI has version
-    `1.25.1-rc1` and its dependencies, `docker-py`,
+    and its dependencies, `docker-py`,
     `CPython`, and `OpenSSL`, are also listed with
     their versions:
 
     
 ![](./images/B15021_05_01.jpg)
-    
-
-Figure 5.1: docker-compose version output
-
-Up until now, we have learned how to install the Docker Compose CLI in
-Linux. Now we will look into the commands and subcommands that manage
-the complete life cycle of multi-container applications.
-
 
 
 Docker Compose CLI Commands
@@ -174,7 +61,7 @@ The output of the command should look like the following:
 
 
 
-Figure 5.2: docker-compose commands
+
 
 There are three essential `docker-compose` commands that are
 used to manage the life cycle of applications. The life cycle and
@@ -183,215 +70,6 @@ commands can be illustrated as follows:
 
 
 ![](./images/B15021_05_03.jpg)
-
-
-
-Figure 5.3: docker-compose life cycle
-
--   `docker-compose up`: This command creates and starts the
-    containers defined in the configuration. It is possible to build
-    container images or use pre-built images from the registry. In
-    addition, it is possible to run the containers in the background in
-    `detached` mode with the `-d` or
-    `--detach` flags. It is convenient to use
-    `detached` mode for long-running containers, such as web
-    servers, that we do not expect to stop in the short term. Additional
-    options and flags can be checked with the
-    `docker-compose up --help` command.
--   `docker-compose ps`: This command lists the containers and
-    their status information. It is helpful for troubleshooting and
-    container health checks. For instance, if you create a two-container
-    application with a backend and a frontend, you can check the status
-    of each container with the `docker-compose ps` command. It
-    helps to find out whether your backend or frontend is down, is not
-    responding to their health checks, or has failed to start due to
-    misconfiguration.
--   `docker-compose down`: This command stops and removes all
-    the resources, including containers, networks, images, and volumes.
-
-
-
-Docker Compose File
--------------------
-
-Multi-container applications are run and defined using the
-`docker-compose` CLI. By convention, the default name of these
-files is `docker-compose.yaml`. Docker Compose is a powerful
-tool; however, its power depends on the configuration. Therefore,
-knowing how to create `docker-compose.yaml` files is essential
-and requires great attention.
-
-Note
-
-Docker Compose works with the `docker-compose.yaml` and
-`docker-compose.yml` file extensions by default. 
-
-`docker-compose.yaml` files consist of four main sections, as
-illustrated in *Figure 5.4*:
-
-
-
-![](./images/B15021_05_04.jpg)
-
-
-
-Figure 5.4: The docker-compose file structure
-
--   `version`: This section defines the syntax version for the
-    `docker-compose` file, and currently, the latest syntax
-    version is `3`.
--   `services`: This section describes the Docker containers
-    that will be built if needed and will be started by
-    `docker-compose`.
--   `networks`: This section describes the networks that will
-    be used by the services.
--   `volumes`: This section describes the data volumes that
-    will be mounted to the containers in services.
-
-For the `services` section, there are two essential options to
-create containers. The first option is to build the container, and the
-second is to use Docker images from the registry. When you are creating
-and testing containers locally, it is advisable to build the images. On
-the other hand, it is faster and easier to use Docker images from the
-registry for production and CI/CD systems.
-
-Imagine you want to build your server container by using a
-`Dockerfile` named `Dockerfile-server`. Then, you
-need to put the file in the `server` folder with the following
-folder structure:
-
-
-
-![](./images/B15021_05_05.jpg)
-
-
-
-Figure 5.5: Folder structure
-
-The output of the `tree` command shows that there is a
-`server` folder containing `Dockerfile-server`.
-
-When the following content is defined in the
-`docker-compose.yaml` file in the root directory, the
-`server` container will be built before running the service:
-
-
-```
-version: "3"
-services:
-  server:
-    build:
-      context: ./server
-      dockerfile: Dockerfile-server
-```
-
-
-Similarly, if you want to use an image from the Docker registry, you can
-define a service with only the `image` field:
-
-
-```
-version: "3"
-services:
-  server:
-    image: nginx
-```
-
-
-Docker Compose creates a single network by default, and each container
-connects to this network. In addition, containers can connect to other
-containers using hostnames. For instance, let\'s assume you have the
-following `docker-compose.yaml` file in the `webapp`
-folder:
-
-
-```
-version: "3"
-services:
-  server:
-    image: nginx
-  db:
-    image: postgres
-    ports:
-      - "8032:5432"
-```
-
-
-When you start `docker-compose` with this configuration, it
-first creates the network with the name `webapp_default`.
-Following that, `docker-compose` creates the
-`server` and `db` containers and joins the
-`webapp_default` network with the names `server` and
-`db`, respectively. 
-
-In addition, the `server` container can connect to the
-database using its `container` port and hostname as follows:
-`postgres://db:5432`. Similarly, the database is reachable
-from the host machine by host port `8032` as follows:
-`postgres://localhost:8032`. The network structure is
-presented in the following diagram:
-
-
-
-![](./images/B15021_05_06.jpg)
-
-
-
-Figure 5.6: Networking structure
-
-Within the `docker-compose.yaml` file, you can define custom
-networks instead of using the default network. The `network`
-configuration enables you to create sophisticated network technologies
-based on your custom network drivers. Networking for Docker containers
-is comprehensively covered in *Lab 6*, *Introduction to Docker
-Networking*. Extending Docker Engine with custom network drivers will be
-covered in the following chapters. 
-
-Docker Compose also creates and manages volumes as a part of the
-`docker-compose.yaml` file. Volumes provide persistency among
-containers and are managed by Docker Engine. All service containers can
-reuse volumes. In other words, data can be shared between the containers
-for synchronization, data preparation, and backup operations. In
-*Lab 7*, *Docker Storage*, volumes for Docker will be presented in
-full detail.
-
-With the following `docker-compose.yaml` file,
-`docker-compose` will create a volume named `data`
-using the default volume plugin in Docker Engine. This volume will be
-mounted to the `/database` path of the `database`
-container and the `/backup` path of the `backup`
-container. This YAML file and its content create a service stack that
-runs a database and continuously backs up without downtime:
-
-
-```
-version: "3"
-services:
-  database:
-    image: my-db-service
-    volumes:
-      - data:/database
-  backup:
-    image: my-backup-service
-    volumes:
-      - data:/backup
-volumes:
-  data:
-```
-
-
-Note
-
-The official reference documentation for Docker Compose files is
-available at <https://docs.docker.com/compose/compose-file/>.
-
-In the following exercise, a multi-container application with networking
-and volume usage will be created with Docker Compose.
-
-Note
-
-Please use `touch` command to create files and `vim`
-command to work on the file using vim editor.
 
 
 
@@ -437,7 +115,7 @@ To complete the exercise, execute the following steps:
     #!/usr/bin/env sh
     rm /data/index.html
     echo "<h1>Welcome from Docker Compose!</h1>" >> /data/index.html
-    echo "<img src='http://bit.ly/moby-logo' />" >> /data/index.html
+    echo "<img src='https://raw.githubusercontent.com/fenago/docker-course/master/md/logo.png' />" >> /data/index.html
     ```
     
 
@@ -511,7 +189,7 @@ To complete the exercise, execute the following steps:
 ![](./images/B15021_05_07.jpg)
     
 
-    Figure 5.7: Starting the application
+
 
     The preceding command creates and starts the containers in
     `detached` mode. It starts by creating the
@@ -534,7 +212,7 @@ To complete the exercise, execute the following steps:
 ![](./images/B15021_05_08.jpg)
     
 
-    Figure 5.8: Application status
+
 
     This output lists two containers. The `init` container
     exited successfully with code `0`, while the
@@ -551,7 +229,7 @@ To complete the exercise, execute the following steps:
 ![](./images/B15021_05_09.jpg)
     
 
-    Figure 5.9: Server output
+
 
     *Figure 5.9* shows the `index.html` page created by the
     `init` container. In other words, it shows that
@@ -573,7 +251,6 @@ To complete the exercise, execute the following steps:
 ![](./images/B15021_05_10.jpg)
     
 
-Figure 5.10: Stopping the application
 
 In this exercise, a multi-container application was created and
 configured by `docker-compose`. Networking and volume options
@@ -584,115 +261,6 @@ the status, and removing the applications.
 In the following section, configuration options for applications in the
 Docker Compose environment will be presented.
 
-
-
-
-
-
-
-
-
-Configuration of Services
-=========================
-
-
-Cloud-native applications are expected to store their configuration in
-environment variables. Environment variables are easy to change between
-different platforms without source code changes. Environment variables
-are dynamic values that are stored in Linux-based systems and used by
-applications. In other words, the variables can be used to configure
-applications by changing their values.
-
-For instance, assume your application uses a `LOG_LEVEL`
-environment variable to configure what is logged. If you change the
-`LOG_LEVEL` environment variable from `INFO` to
-`DEBUG` and restart your application, you would see more logs
-and be able to troubleshoot problems more easily. In addition, you can
-deploy the same application with different sets of environment variables
-to staging, testing, and production. Likewise, the method of configuring
-services in Docker Compose is to set environment variables for the
-containers.
-
-There are three methods of defining environment variables in Docker
-Compose, with the following priority:
-
-1.  Using the Compose file
-2.  Using shell environment variables
-3.  Using the environment file
-
-If the environment variables do not change very often but are required
-by the containers, it is better to store them in
-`docker-compose.yaml` files. If there are sensitive
-environment variables, such as passwords, it is recommended to pass them
-via shell environment variables before calling the
-`docker-compose` CLI. However, if the number of the variables
-is high and varies between the testing, staging, or production systems,
-it is easier to collect them in `.env` files and pass them
-into `docker-compose.yaml` files.
-
-In the `services` part of the `docker-compose.yaml`
-file, environment variables can be defined for each service. For
-example, the `LOG_LEVEL` and `METRICS_PORT`
-environment variables are set in the Docker Compose file as follows for
-the `server` service:
-
-
-```
-server:
-  environment:
-    - LOG_LEVEL=DEBUG
-    - METRICS_PORT=8444
-```
-
-
-When the values are not set for the environment variables in the
-`docker-compose.yaml` file, it is possible to get the values
-from the shell by running a `docker-compose` command. For
-instance, the `HOSTNAME` environment variable for the
-`server` service will be set straight from the shell:
-
-
-```
-server:
-  environment:
-    - HOSTNAME
-```
-
-
-When the shell running the `docker-compose` command has no
-value for the `HOSTNAME` environment variable, the container
-will start with an empty environment variable.
-
-In addition, it is possible to store the environment variables in
-`.env` files and configure them in
-`docker-compose.yaml` files. An example
-`database.env` file can be structured with key-value lists as
-follows:
-
-
-```
-DATABASE_ADDRESS=mysql://mysql:3535
-DATABASE_NAME=db
-```
-
-
-In the `docker-compose.yaml` file, the environment variable
-file field is configured under the corresponding service as follows:
-
-
-```
-server:
-  env_file:
-    - database.env
-```
-
-
-When Docker Compose creates the `server` service, it will set
-all the environment variables listed in the `database.env`
-file to the container.
-
-In the following exercise, you will configure an application using all
-three configuration methods in Docker Compose.
 
 
 
@@ -771,7 +339,7 @@ To complete the exercise, execute the following steps:
 ![](./images/B15021_05_11.jpg)
     
 
-Figure 5.11: Starting the application
+
 
 The output is the result of the `print` container defined in
 the `docker-compose` file. The container has one command to
@@ -796,64 +364,6 @@ of the containers in the Docker Compose applications will be presented
 in the following section.
 
 
-
-
-
-
-
-
-
-Service Dependency
-==================
-
-
-Docker Compose runs and manages multi-container applications defined in
-`docker-compose.yaml` files. Although the containers are
-designed as independent microservices, creating services that depend on
-each other is highly expected. For instance, let\'s assume you have a
-two-tier application with database and backend components, such as a
-PostgreSQL database and a Java backend. The Java backend component
-requires PostgreSQL to be up and running since it should connect to the
-database to run the business logic. Therefore, you could need to define
-the dependency between the services of the multi-container applications.
-With Docker Compose, it is possible to control the order of the startup
-and shutdown of the services.
-
-Say you have a three-container application with the following
-`docker-compose.yaml` file:
-
-
-```
-version: "3"
-services:
-  init:
-    image: busybox
-  pre:
-    image: busybox
-    depends_on:
-    - "init"
-  main:
-    image: busybox
-    depends_on:
-    - "pre"
-```
-
-
-In this file, the `main` container depends on the
-`pre` container, whereas the `pre` container depends
-on the `init` container. Docker Compose starts the containers
-in the order of `init`, `pre`, and `main`,
-as illustrated in *Figure 5.12*. In addition, the containers will be
-stopped in reverse order: `main`, `pre`, and then
-`init`:
-
-
-
-![](./images/B15021_05_12.jpg)
-
-
-
-Figure 5.12: Service startup order
 
 In the following exercise, the order of containers will be used to fill
 the contents of a file and then serve it with a web server.
@@ -935,7 +445,7 @@ To complete the exercise, execute the following steps:
 ![](./images/B15021_05_13.jpg)
     
 
-    Figure 5.13: Starting the application
+
 
     The output shows that Docker Compose creates the containers in the
     order of `clean`, `init`, and then
@@ -947,7 +457,7 @@ To complete the exercise, execute the following steps:
 ![](./images/B15021_05_14.jpg)
     
 
-    Figure 5.14: Server output
+
 
     The output from the server shows that the `clean`,
     `init`, and `pre` containers work in the
@@ -961,7 +471,7 @@ To complete the exercise, execute the following steps:
 ![](./images/B15021_05_15.jpg)
     
 
-Figure 5.15: Stopping the application
+
 
 In this exercise, a Docker Compose application was created with
 interdependent services. How Docker Compose starts and manages
@@ -1010,7 +520,7 @@ Perform the following steps to complete this activity:
 ![](./images/B15021_05_16.jpg)
     
 
-Figure 5.16: WordPress and database containers
+
 
 You will then be able to reach the setup screen of WordPress in the
 browser:
@@ -1074,7 +584,7 @@ Perform the following steps to complete this activity:
 ![](./images/B15021_05_18.jpg)
     
 
-    Figure 5.18: The application, database, and nginx containers
+
 
 5.  Go to the administration section of the Panoramic Trekking App in
     the browser with the address `http://0.0.0.0:8000/admin`:
@@ -1083,7 +593,7 @@ Perform the following steps to complete this activity:
 ![](./images/B15021_05_19.jpg)
     
 
-    Figure 5.19: Admin setup logon
+
 
     You can log in with the username `admin` and password
     `changeme` and add new photos and countries:
@@ -1092,7 +602,7 @@ Perform the following steps to complete this activity:
 ![](./images/B15021_05_20.jpg)
     
 
-    Figure 5.20: Admin setup view
+
 
 6.  Access the Panoramic Trekking App at the address
     `http://0.0.0.0:8000/photo_viewer` in the browser:
@@ -1107,15 +617,6 @@ Perform the following steps to complete this activity:
 
 Summary
 =======
-
-
-This lab focused on using Docker Compose to design, create, and
-manage multi-container applications. The complexity of containerized
-applications has increased with the rise of the microservice
-architecture. Thus, it has become difficult to create, manage, and
-troubleshoot multi-container applications without the appropriate
-tooling. Docker Compose is the official tool in the Docker toolbox for
-this purpose.
 
 In this lab, the main focus was to learn `docker-compose`
 comprehensively. With this aim, the lab started with the
@@ -1132,15 +633,4 @@ environments and adapt to changes in the future. We then moved on to
 service dependencies to learn how to create more complex containerized
 applications.
 
-Every exercise in this lab aimed to show the capabilities of Docker,
-including different CLI commands and YAML file sections. It is essential
-to get hands-on experience of the CLI and the files needed to create
-multi-container applications for use in testing and production
-environments.
-
 In the next lab, you will learn about networking in Docker.
-Networking in containerized and scalable applications is one of the
-critical parts of the infrastructure, as it glues together the
-distributed parts. That\'s why networking in Docker consists of
-pluggable drivers and options to enhance the containerized application
-development and management experience.

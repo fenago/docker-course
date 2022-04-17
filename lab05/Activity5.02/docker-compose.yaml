@@ -10,14 +10,14 @@ services:
       - POSTGRES_PASSWORD=docker
 
   web:
-    image: packtworkshops/the-docker-workshop:chapter5-pta-web
+    image: fenago/docker-course:lab5-pta-web
     volumes:
       - static_data:/service/static
     depends_on:
       - db
 
   nginx:
-    image: packtworkshops/the-docker-workshop:chapter5-pta-nginx
+    image: fenago/docker-course:lab5-pta-nginx
     volumes:
       - static_data:/service/static
     ports:

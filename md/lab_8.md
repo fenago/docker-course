@@ -1,11 +1,7 @@
-Docker Swarm
-===============
+Lab 8: Docker Swarm
+===================
 
 
-
-
-
-Overview
 
 In this lab, you will work with Docker Swarm from the command line
 to manage running nodes, deploy services, and perform rolling updates on
@@ -17,248 +13,6 @@ you with the knowledge you need to get started using Swarmpit, which is
 a web-based interface for running and managing your Docker Swarm
 services and clusters.
 
-
-
-
-
-
-
-
-
-Introduction
-============
-
-
-So far in this book, we\'ve run our Docker containers and controlled the
-way they run from the command line using direct commands such as
-`docker run` to launch containers. Our next step is to
-automate things with the use of Docker Compose, which allows an entire
-environment of containers to work together. Docker Swarm is the next
-step in managing our Docker environments. **Docker Swarm** allows you to
-orchestrate how your containers can scale and work together to provide a
-more reliable service to your end-users.
-
-Docker Swarm allows you to set up multiple servers running Docker Engine
-and organize them as a cluster. Docker Swarm can then run commands to
-coordinate your containers across the cluster instead of just one
-server. Swarm will configure your cluster to make sure your services are
-balanced across your cluster, ensuring higher reliability for your
-services. It will also decide for you which service will be assigned to
-which server depending on the load across your cluster. Docker Swarm is
-a step up in terms of managing the way you run your containers and is
-provided by default with Docker.
-
-Docker Swarm allows you to configure redundancy and failover for your
-services while scaling the number of containers up and down depending on
-the load. You can perform rolling updates across your services to reduce
-the chances of an outage, meaning new versions of your container
-applications can be applied to the cluster without these changes causing
-an outage for your customers. It will allow you to orchestrate your
-container workloads through the swarm instead of manually managing
-containers one by one.
-
-Swarm also introduces some new terms and concepts when it comes to
-managing your environment, defined in the following list:
-
--   **Swarm**: Multiple Docker hosts run in swarm mode to act as
-    managers and workers. Having multiple nodes and workers is not
-    compulsory as part of Docker Swarm. You can run your services as a
-    single node swarm, which is the way we will be working in this
-    lab, even though a production cluster may have multiple nodes
-    available to make sure your services are as fault-tolerant as
-    possible.
-
--   **Task**: The manager distributes the tasks to run inside the nodes.
-    A task consists of a Docker container and the commands that will run
-    inside the container.
-
--   **Service**: This defines the tasks to execute on the manager or
-    worker. The difference between services and a standalone container
-    is that you can modify a service\'s configuration without restarting
-    the service.
-
--   **Node**: An individual system running Docker Engine and
-    participating in the swarm is a node. More than one node can run on
-    a single physical computer at one time through the use of
-    virtualization.
-
-    Note
-
-    We will only be using one node on our system.
-
--   **Manager**: The manager dispatches tasks to worker nodes. The
-    manager carries out orchestration and cluster management. It also
-    hosts services on the cluster.
-
--   **Leader node**: The manager node in the swarm elects a single
-    primary leader node to conduct the orchestration tasks across the
-    cluster.
-
--   **Worker nodes**: Worker nodes execute the tasks assigned by the
-    manager node.
-
-Now that you are familiar with the key terms, let\'s explore how Docker
-Swarm works in the following section.
-
-
-
-
-
-
-
-
-
-How Docker Swarm Works?
-=======================
-
-
-The swarm manager nodes handle cluster management, and the main
-objective is to maintain a consistent state of both the swarm and the
-services running on it. This includes ensuring that the cluster is
-running at all times and that services are run and scheduled when
-needed.
-
-As there are multiple managers running at the same time, this means
-there is fault tolerance, especially in a production environment. That
-is, if one manager is shut down, the cluster will still have another
-manager to coordinate services on the cluster. The sole purpose of
-worker nodes is to run Docker containers. They require at least one
-manager to function, but worker nodes can be promoted to being a
-manager, if needed.
-
-Services permit you to deploy an application image to a Docker swarm.
-These are the containers to run and the commands to execute inside the
-running container. Service options are provided when you create a
-service, where you can specify the ports the application can publish on,
-CPU and memory restrictions, the rolling update policy, and the number
-of replicas of an image that can run.
-
-The desired state is set for the service, and the manager\'s
-responsibility is to monitor the service. If the service is not in the
-desired state, it will correct any issues. If a task fails, the
-orchestrator simply removes the container related to the failed task and
-replaces it.
-
-Now that you know how Docker Swarm works, the next section will get you
-started with the basic commands and guide you through a hands-on
-exercise to further demonstrate its operation.
-
-
-
-
-
-
-
-
-
-Working with Docker Swarm
-=========================
-
-
-The previous section of this lab has shown you that Swarm uses
-similar concepts to what you have already learned so far in this book.
-You\'ll see that the use of Swarm takes the Docker commands you are so
-familiar with and expands them to allow you to create your clusters,
-manage services, and configure your nodes. Docker Swarm takes a lot of
-the hard work out of running your services, as Swarm will work out where
-it is best to place your services, take care of scheduling your
-containers, and decide which node it is best to place it on. For
-example, if there are already three services running on one node and
-only one service on your second node, Swarm will know that it should
-distribute the services evenly across your system.
-
-By default, Docker Swarm is disabled, so to run Docker in swarm mode,
-you will need to either join an existing cluster or create a new swarm.
-To create a new swarm and activate it in your system, you use the
-`swarm init` command shown here:
-
-
-```
-docker swarm init
-```
-
-
-This will create a new single-node swarm cluster on the node you are
-currently working on. Your system will become the manager node for the
-swarm you have just created. When you run the `init` command,
-you\'ll also be provided with the details on the commands needed to
-allow other nodes to join your swarm.
-
-For a node to join a swarm, it requires a secret token, and the token
-for a worker node is different from that of a manager node. The manager
-tokens need to be strongly protected so you don\'t allow your swarm
-cluster to become vulnerable. Once you have the token, IP address, and
-port of the swarm that your node needs to join, you run a command
-similar to the one shown here, using the `--token` option:
-
-
-```
-docker swarm join --token <swarm_token> <ip_address>:<port>
-```
-
-
-If for some reason you need to change the tokens (possibly for security
-reasons), you can run the `join-token --rotate` option to
-generate new tokens as shown here:
-
-
-```
-docker swarm join-token --rotate
-```
-
-
-From the swarm manager node, the following `node ls` command
-will allow you to see the nodes available in your swarm and provide
-details on the status of the node, whether it is a manager or a worker,
-and whether there are any issues with the node:
-
-
-```
-docker node ls
-```
-
-
-Once your swarm is available and ready to start hosting services, you
-can create a service with the `service create` command,
-providing the name of the service, the container image, and the commands
-needed for the service to run correctly---for example, if you need to
-expose ports or mount volumes:
-
-
-```
-docker service create --name <service> <image> <command>
-```
-
-
-Changes can then be made to the service configuration, or you can change
-the way the service is running by using the `update` command,
-as shown here:
-
-
-```
-docker service update <service> <changes>
-```
-
-
-Finally, if you need to remove or stop the service from running, you
-simply use the `service remove` command:
-
-
-```
-docker service remove <service>
-```
-
-
-We\'ve provided a lot of theory on Docker Swarm here, and we hope it has
-provided you with a clear understanding of how it works and how you can
-use Swarm to launch your services and scale to provide a stable service
-when there is high demand. The following exercise will take what we have
-learned so far and show you how to implement it in your projects.
-
-Note
-
-Please use `touch` command to create files and `vim`
-command to work on the file using vim editor.
 
 
 
@@ -446,7 +200,7 @@ using Docker Swarm:
 ![](./images/B15021_09_01.jpg)
     
 
-    Figure 9.1: The nginx service from Docker Swarm
+
 
 8.  Scaling the number of containers running your service is easy with
     Docker Swarm. Simply provide the `scale` option with the
@@ -659,207 +413,12 @@ about deploying your work into a production environment. We used the
 Docker Hub NGINX image, but we could easily use any service we have
 created as a Docker image that is available to our Swarm node.
 
-The next section will take a quick sidestep to discuss some actions you
-need to take if you find yourself in trouble with your Swarm nodes.
-
-
-
-
-
-
-
-
-
-Troubleshooting Swarm Nodes
-===========================
-
-
-For the work we will be doing in this lab, we will be using only a
-single-node swarm to host our services. Docker Swarm has been providing
-production-level environments for years now. However, this doesn\'t mean
-there will never be any issues with your environment, especially when
-you start hosting services in a multi-node swarm. If you need to
-troubleshoot any of the nodes running on your cluster, there are a
-number of steps you can take to make sure you are correcting any issues
-they may have:
-
--   **Reboot**: Usually the easiest option is to either reboot or
-    restart the node system to see whether this resolves the issues you
-    may be experiencing.
-
--   **Demote the node**: If the node is a manager on your cluster, try
-    demoting the node using the `node demote` command:
-
-    
-    ```
-    docker node demote <node_id>
-    ```
-    
-
-    If this node is the leader, it will allow one of the other manager
-    nodes to become the leader of the swarm and hopefully resolve any
-    issues you may be experiencing.
-
--   **Remove the node from the cluster**: Using the `node rm`
-    command, you can remove the node from the cluster:
-
-    
-    ```
-    docker node rm <node_id>
-    ```
-    
-
-    This can also be an issue if the node is not communicating correctly
-    with the rest of the swarm, and you may need to use the
-    `--force` option to remove the node from the cluster:
-
-    
-    ```
-    docker node rm --force <node_id>
-    ```
-    
-
--   **Join back to the cluster**: If the preceding has worked correctly,
-    you may be able to successfully join the node back onto the cluster
-    with the `swarm join` command. Remember to use the token
-    that you used before when joining the swarm:
-
-    
-    ```
-    docker node swarm join --token <token> <swarm_ip>:<port>
-    ```
-    
-
-    Note
-
-    If your services are still having issues running on Docker Swarm and
-    you have corrected all issues with the Swarm nodes, Swarm is simply
-    using Docker to run and deploy your services onto the nodes in your
-    environment. Any issues may come down to basic troubleshooting with
-    the container image you are trying to run on Swarm and not the Swarm
-    environment itself.
-
-A cluster of managers is known as a **quorum**, and a majority of the
-managers need to agree on the proposed updates to the swarm, such as
-adding new nodes or scaling back the number of containers. As we saw in
-the previous section, you can monitor swarm managers\' or nodes\' health
-by running the `docker node ls` command, using the ID of the
-manager to then use the `docker node inspect` command as shown
-here:
-
-
-```
-docker node inspect <node_id>
-```
-
-
-Note
-
-One final note on your Swarm node is to remember to deploy services to
-your nodes that have been created as Docker images. The container image
-itself needs to be available for download from a central Docker
-Registry, which is available for all the nodes to download from and not
-simply built on one of the Swarm nodes.
-
-Although we\'ve taken a quick detour to discuss troubleshooting your
-Swarm nodes, this should not be a major aspect of running services on
-Swarm. The next part of this lab moves a step further by showing you
-how you can use new or existing `docker-compose.yml` files to
-automate the deployment of your services into Docker Swarm.
-
-
-
-
-
-
-
-
 
 Deploying Swarm Deployments from Docker Compose
 ===============================================
 
 
-Deploying a complete environment is easy with Docker Swarm; you\'ll see
-that most of the work is already done if you have been running your
-containers using Docker Compose. This means you won\'t need to manually
-start services one by one in Swarm as we did in the previous section of
-this lab.
-
-If you already have a `docker-compose.yml` file available to
-bring up your services and applications, there is a good chance it will
-simply work without issues. Swarm will use the `stack deploy`
-command to deploy all your services across the Swarm nodes. All you need
-to do is provide the `compose` file and assign the stack a
-name:
-
-
-```
-docker stack deploy --compose-file <compose_file> <swarm_name>
-```
-
-
-The stack creation is quick and seamless, but a lot is happening in the
-background to make sure all services are running correctly---including
-setting up networks between all the services and starting up each of the
-services in the order needed. Running the `stack ps` command
-with the `swarm_name` you provided at creation time will show
-you whether all the services in your deployment are running:
-
-
-```
-docker stack ps <swarm_name>
-```
-
-
-And once you are finished using the services on your swarm or you need
-to clean up everything that is deployed, you simply use the
-`stack rm` command, providing the `swarm_name` you
-provided when you created the stack deployment. This will automatically
-stop and clean up all the services running in your swarm and ready them
-for you to reassign to other services:
-
-
-```
-docker stack rm <swarm_name>
-```
-
-
-Now, since we know the commands used to deploy, run, and manage our
-Swarm stack, we can look at how to perform rolling updates for our
-services.
-
-
-
-
-
-
-
-
-
-Swarm Service Rolling Updates
-=============================
-
-
-Swarm also has the ability to perform rolling updates on the services
-that are running. This means if you have a new update to an application
-running on your Swarm, you can create a new Docker image and update your
-service, and Swarm will make sure the new image is up and running
-successfully before it brings down the old version of your container
-image.
-
-Performing a rolling update on a service you have running in Swarm is
-simply a matter of running the `service update` command. In
-the following command, you can see both the new container image name and
-the service you want to update. Swarm will handle the rest:
-
-
-```
-docker service update --image <image_name:tag> <service_name>
-```
-
-
-You\'ll get the chance very shortly to use all the commands we\'ve
-explained here. In the following example, you will create a small test
+In the following example, you will create a small test
 application using Django and PostgreSQL. The web application you will be
 setting up is very basic, so there is no real need to have a prior
 understanding of the Django web framework. Simply follow along and we
@@ -1123,7 +682,7 @@ services manually:
 ![](./images/B15021_09_02.jpg)
     
 
-    Figure 9.2: Deploying a service to Swarm with Docker Compose file
+
 
 13. To view the stacks currently running on your system, use the
     `stack ls` command:
@@ -1383,111 +942,8 @@ values used within your environment.
 
 
 
-
-
-
-
-
 Managing Secrets and Configurations with Docker Swarm
 =====================================================
-
-
-So far in this lab, we have observed Docker Swarm\'s proficiency at
-orchestrating our services and applications. It also provides
-functionality to allow us to define configurations within our
-environment and then use these values. Why do we need this
-functionality, though?
-
-Firstly, the way we have been storing details such as our secrets has
-not been very secure, especially when we are typing them in plain text
-in our `docker-compose.yml` file or including them as part of
-our built Docker image. For our secrets, Swarm allows us to store
-encrypted values that are then used by our services.
-
-Secondly, by using these features, we can start to move away from
-setting up configurations in our `Dockerfile`. This means we
-can create and build our application as a container image. Then, we can
-run our application on any environment, be it a development system on a
-laptop or a test environment. We can also run the application on a
-production environment, where we assign it with a separate configuration
-or secrets value to use in that environment.
-
-Creating a Swarm `config` is simple, especially if you already
-have an existing file to use. The following code shows how we can create
-a new `config` using the `config create` command by
-providing our `config_name` and the name of our
-`configuration_file`:
-
-
-```
-docker config create <config_name> <configuration_file> 
-```
-
-
-This command creates a `config` stored as part of the swarm
-and is available to all the nodes in your cluster. To view the available
-configs on your system and the swarm, run the `ls` option with
-the `config` command:
-
-
-```
-docker config ls
-```
-
-
-You can also view the details in the configuration using the
-`config inspect` command. Make sure you are using the
-`--pretty` option since the output is presented as a long JSON
-output that would be almost unreadable without it:
-
-
-```
-docker config inspect --pretty <config_name>
-```
-
-
-Using secrets within Swarm provides a secure way to create and store
-sensitive information in our environments, such as usernames and
-passwords, in an encrypted state so it can then be used by our services.
-
-To create a secret that is only holding a single value, such as a
-username or password, we can simply create the secret from the command
-line, where we pipe the secret value into the `secret create`
-command. The following sample command provides an example of how to do
-this. Remember to name the secret when you create it:
-
-
-```
-echo "<secret_password>" | docker secret create <secret_name> –
-```
-
-
-You can make a secret from a file. For example, say you would like to
-set up a certificates file as a secret. The following command shows how
-to do this using the `secret create` command by providing the
-name of the secret and the name of the file you need to create the
-secret from:
-
-
-```
-docker secret create <secret_name> <secret_file> 
-```
-
-
-Once created, your secret will be available on all the nodes you have
-running on your swarm. Just as you were able to view your
-`config`, you can use the `secret ls` command to see
-a listing of all the available secrets in your swarm:
-
-
-```
-docker secret ls
-```
-
-
-We can see that Swarm provides us with flexible options to implement
-configurations and secrets in our orchestration, instead of needing to
-have it set up as part of our Docker images.
 
 The following exercise will demonstrate how to use both configurations
 and secrets in your current Docker Swarm environment.
@@ -2246,7 +1702,7 @@ web interface, and begin managing your services from your web browser:
 ![](./images/B15021_09_03.jpg)
     
 
-    Figure 9.3: The Swarmpit login screen
+
 
 5.  Once you log in, you\'re presented with the Swarmpit welcome screen,
     showing your dashboard of all your services running on the node, as
@@ -2263,7 +1719,7 @@ web interface, and begin managing your services from your web browser:
 ![](./images/B15021_09_04.jpg)
     
 
-    Figure 9.4: The Swarmpit welcome dashboard
+
 
 6.  You should be presented with a screen similar to the following. The
     size of the screen has been reduced for clarity, but as you can see,
@@ -2277,7 +1733,7 @@ web interface, and begin managing your services from your web browser:
 ![](./images/B15021_09_05.jpg)
     
 
-    Figure 9.5: Managing your swarm with Swarmpit
+
 
 7.  Editing the stack brings up a page where you can make changes
     directly to the stack as if you were making changes to
@@ -2289,7 +1745,7 @@ web interface, and begin managing your services from your web browser:
 ![](./images/B15021_09_06.jpg)
     
 
-    Figure 9.6: Editing your swarm with Swarmpit
+
 
 8.  Click on the `Deploy` button at the bottom of the screen.
     This will deploy the changes to your `test_swarm` stack
@@ -2301,7 +1757,7 @@ web interface, and begin managing your services from your web browser:
 ![](./images/B15021_09_07.jpg)
     
 
-    Figure 9.7: Increased number of web services in Swarmpit
+
 
 9.  Notice that most of the options in Swarmpit are linked. On the
     `test_swarm` stack page, if you click on the web service
@@ -2313,7 +1769,7 @@ web interface, and begin managing your services from your web browser:
 ![](./images/B15021_09_08.jpg)
     
 
-    Figure 9.8: Managing services with Swarmpit
+
 
 10. Select `Rollback Service` from the menu, and you will see
     the number of replicas of the `test_swarm_web` service
@@ -2329,7 +1785,7 @@ web interface, and begin managing your services from your web browser:
 ![](./images/B15021_09_09.jpg)
     
 
-Figure 9.9: Deleting a web service in Swarmpit
+
 
 Note
 

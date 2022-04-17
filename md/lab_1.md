@@ -1,5 +1,5 @@
-Running My First Docker Container
-====================================
+Lab 1: Running My First Docker Container
+========================================
 
 Docker first runs a container, if it does not have
 the container image stored in its local cache, it will download the

@@ -1,11 +1,5 @@
-Docker Storage
-=================
-
-
-
-
-
-Overview
+Lab 7: Docker Storage
+=====================
 
 In this lab, you will learn how Docker manages data. It is crucial
 to know where to store your data and how your services will access it.
@@ -15,184 +9,6 @@ storage for different applications. By the end of the lab, you will
 be able to distinguish between the different storage types in Docker and
 identify the container\'s life cycle and its various states. You will
 also learn how to create and manage Docker volumes.
-
-
-
-
-
-
-
-
-
-Introduction
-============
-
-
-In previous chapters, you learned how to run a container from an image
-and how to configure its networking. You also learned that you can pass
-various Docker commands while crafting containers from the images. In
-this lab, you will learn how to control these containers after you
-have created them.
-
-Assume that you have been assigned to build a web application for an
-e-store. You will need a database to store the products catalog,
-clients\' information, and purchase transactions. To store these
-details, you need to configure the application\'s storage settings.
-
-There are two types of data storage in Docker. The first one is storage
-that is tightly coupled to the container life cycle. If the container is
-removed, the files on that storage type are also removed and cannot be
-retrieved. These files are stored in the thin read/write layer inside
-the container itself. This type of storage is also known by other terms,
-such as the local storage, the `graphdriver` storage, and the
-storage driver. The first section of this lab focuses on this type
-of storage. These files could be of any type---for example, the files
-Docker created after installing a new layer on top of the base image.
-
-The second section of the lab explores stateless and stateful
-services. Stateful applications are the ones that need persistent
-storage, such as databases that persist and outlive the container. In
-stateful services, the data can still be accessed even when the
-container is removed.
-
-The container stores the data on the host in two ways: through volumes
-and bind mounts. Using a bind mount is not recommended because the bind
-mount binds an existing file or directory on the host to a path inside
-the container. This bind adds a burden in referencing by using the full
-or relative path on the host machine. However, a new directory is
-created within Docker\'s storage directory on the host machine when you
-use a volume, and Docker manages the directory\'s contents. We will
-focus on using volumes in the third section of this lab.
-
-Before exploring different types of storage in Docker, let\'s first
-explore the container life cycle.
-
-
-
-
-
-
-
-
-
-The Container Life Cycle
-========================
-
-
-Containers are crafted from their base images. The container inherits
-the filesystem of the image by creating a thin
-read/write layer on top of the image layers\' stack. The base images
-stay intact, and no changes are made to them. All your changes happen in
-that top layer of the container. For example, say you create a container
-of `ubuntu: 14.08`. This image does not have the
-`wget` package in it. When you install the `wget`
-package, you actually install it on the top layer. So, you have a layer
-for the base image, and on top of it, another layer for
-`wget`.
-
-If you install the `Apache` server as well, it will be the
-third layer on top of both of the previous layers. To save all your
-changes, you need to commit all these changes to a new image because you
-cannot write over the base image. If you do not commit the changes to a
-new image, these changes will be deleted with the container\'s removal.
-
-The container undergoes many other states during its life cycle, so it
-is important to look into all the states that a container can have
-during its life cycle. So, let\'s dive into understanding the different
-container states:
-
-
-
-![](./images/B15021_07_01.jpg)
-
-
-
-Figure 7.1: Container life cycle
-
-The different stages that a container undergoes are as follows:
-
--   The container enters the `CREATED` status using the
-    `docker container run` subcommand, as shown in *Figure
-    7.1*.
-
--   Inside every container, there is a main process running. When this
-    process begins running, the container\'s status changes to the
-    `UP` status.
-
--   The container\'s status changes to `UP(PAUSED)` by using
-    the `docker container pause` subcommand. The container
-    freezes or suspends but is still in the `UP` state and is
-    not stopped or removed.
-
--   To resume running the container, use the
-    `docker container unpause` subcommand. Here, the
-    container\'s status will change to the `UP` status again.
-
--   Use the `docker container stop` subcommand to stop the
-    container without removing it. The container\'s status changes to
-    the `EXITED` status.
-
--   The container will exit if you execute the
-    `docker container kill` or
-    `docker container stop` subcommands. To kill the
-    container, use the `docker container kill` subcommand. The
-    container status changes to `EXITED`. However, to make the
-    container exit, you should use `docker container stop`
-    subcommand and not `docker container kill` subcommand. Do
-    not kill your containers; always remove them because removing the
-    container triggers a grace shutdown to the container, giving time,
-    for example, to save the data to a database, which is a slower
-    process. However, killing does not do that and might cause data
-    inconsistency.
-
--   After stopping or killing the container, you can also resume running
-    the container. To start the container and return it to the
-    `UP` status, use the `docker container start` or
-    `docker container start -a` subcommands.
-    `docker container start -a` is equal to running
-    `docker container start` and then
-    `docker container attach`. You cannot attach local
-    standard input, output, and error streams to an exited container;
-    the container must be in the `UP` state first to attach
-    local standard input, output, and error streams.
-
--   To restart a container, use the `docker container restart`
-    subcommand. The restart subcommand acts like executing
-    `docker container stop` followed by
-    `docker container start`.
-
--   Stopping or killing the container does not remove the container from
-    the system. To remove the container entirely, use the
-    `docker container rm` subcommand.
-
-    Note
-
-    You can concatenate several Docker commands to each other -- for
-    example,
-    `docker container rm -f $(docker container ls -aq)`. The
-    one that you want to execute first should be included in the
-    brackets.
-
-    In this case, `docker container ls -aq` tells Docker to
-    list all the containers, even the exited one, in quiet mode. The
-    `-a` option denotes displaying all the containers,
-    whatever their states are. The `-q` option is used for
-    quiet mode, which means displaying the numeric IDs only and not all
-    the containers\' details. The output of this command,
-    `docker container ls -aq`, will be the input of the
-    `docker container rm -f` command.
-
-Understanding the Docker container life cycle events provides a good
-background as to why some applications may or may not need persistent
-storage. Before moving on to the different storage types present in
-Docker, let\'s execute the aforementioned commands and explore the
-different container states in the following exercise.
-
-Note
-
-Please use `touch` command to create files and `vim`
-command to work on the file using vim editor.
-
 
 
 Exercise 7.01: Transitioning through the Common States for a Docker Container
@@ -222,7 +38,7 @@ To ping www.google.com, you will craft a container called
 
     
     ```
-    $docker container run --name testevents ubuntu:14.04 ping google.com
+    docker container run --name testevents ubuntu:14.04 ping google.com
     ```
     
 
@@ -250,7 +66,7 @@ To ping www.google.com, you will craft a container called
 
     
     ```
-    $docker container ls
+    docker container ls
     ```
     
 
@@ -272,7 +88,7 @@ To ping www.google.com, you will craft a container called
 
     
     ```
-    $docker container pause testevents
+    docker container pause testevents
     ```
     
 
@@ -284,7 +100,7 @@ To ping www.google.com, you will craft a container called
 
     
     ```
-    $docker container ls
+    docker container ls
     ```
     
 
@@ -306,7 +122,7 @@ To ping www.google.com, you will craft a container called
 
     
     ```
-    $docker container unpause testevents
+    docker container unpause testevents
     ```
     
 
@@ -318,7 +134,7 @@ To ping www.google.com, you will craft a container called
 
     
     ```
-    $docker container ls
+    docker container ls
     ```
     
 
@@ -339,7 +155,7 @@ To ping www.google.com, you will craft a container called
 
     
     ```
-    $docker container stop testevents
+    docker container stop testevents
     ```
     
 
@@ -360,7 +176,7 @@ To ping www.google.com, you will craft a container called
 
     
     ```
-    $docker container ls
+    docker container ls
     ```
     
 
@@ -380,7 +196,7 @@ To ping www.google.com, you will craft a container called
 
     
     ```
-    $docker container ls -a
+    docker container ls -a
     ```
     
 
@@ -403,7 +219,7 @@ To ping www.google.com, you will craft a container called
 
     
     ```
-    $docker container start -a testevents
+    docker container start -a testevents
     ```
     
 
@@ -423,7 +239,7 @@ To ping www.google.com, you will craft a container called
 
     
     ```
-    $docker container ls
+    docker container ls
     ```
     
 
@@ -445,7 +261,7 @@ To ping www.google.com, you will craft a container called
 
     
     ```
-    $docker container rm -f testevents
+    docker container rm -f testevents
     ```
     
 
@@ -463,7 +279,7 @@ To ping www.google.com, you will craft a container called
 
     
     ```
-    $docker container ls -a
+    docker container ls -a
     ```
     
 
@@ -490,7 +306,7 @@ To ping www.google.com, you will craft a container called
 
     
     ```
-    $docker container run --name testcreate ubuntu:14.04 time
+    docker container run --name testcreate ubuntu:14.04 time
     ```
     
 
@@ -501,7 +317,7 @@ To ping www.google.com, you will craft a container called
 
     
     ```
-    $docker container ls
+    docker container ls
     ```
     
 
@@ -518,7 +334,7 @@ To ping www.google.com, you will craft a container called
 
     
     ```
-    $docker container ls -a
+    docker container ls -a
     ```
     
 
@@ -571,7 +387,7 @@ state transition on data retention:
 
     
     ```
-    $docker container run -it --name testsize ubuntu:14.04
+    docker container run -it --name testsize ubuntu:14.04
     ```
     
 
@@ -594,7 +410,7 @@ state transition on data retention:
 
     
     ```
-    $docker image ls
+    docker image ls
     ```
     
 
@@ -616,7 +432,7 @@ state transition on data retention:
 
     
     ```
-    $docker container ls -s
+    docker container ls -s
     ```
     
 
@@ -666,7 +482,7 @@ state transition on data retention:
 
     
     ```
-    $docker container ls -s
+    docker container ls -s
     ```
     
 
@@ -696,15 +512,10 @@ top writable layer. Knowing the size that every container consumes is
 useful to avoid an out-of-disk-space exception. Moreover, it can help us
 in troubleshooting and setting a maximum size for every container.
 
-Note
+**Note**
 
-Docker uses storage drivers to write in the writable layer. The storage
-drivers differ depending on the operating system that you are using. To
-find the updated list of storage drivers, check out
-https://docs.docker.com/storage/storagedriver/select-storage-driver/.
-
-To find out what driver your operating system is using, run the
-`$docker info` command.
+Docker uses storage drivers to write in the writable layer. To find out what driver your operating system is using, run the
+`docker info` command.
 
 An understanding of Docker container life cycle events provides a good
 background when studying why some applications may or may not need
@@ -715,46 +526,6 @@ removed.
 Now, let\'s delve into the stateful and stateless modes to decide which
 container needs persistent storage.
 
-
-
-
-
-
-
-
-
-Stateful versus Stateless Containers/Services
-=============================================
-
-
-Containers and services can run in two modes: **stateful** and
-**stateless**. A stateless service is the one that does not retain
-persistent data. This type is much easier to scale and update than the
-stateful one. A stateful service requires persistent storage (as in
-databases). Therefore, it is harder to dockerize because stateful
-services need synchronization with the other components of the
-application.
-
-Say you\'re dealing with an application that needs a certain file in
-order to work correctly. If this file is saved inside a container, as in
-the stateful mode, when this container is removed for whatever reason,
-the whole application crashes. However, if this file is saved in a
-volume or an external database, any container will be able to access it,
-and the application will work fine. Say business is booming and we need
-to scale up the number of containers running to fulfill the clients\'
-needs. All the containers will be able to access the file, and scaling
-will be easy and smooth.
-
-Apache and NGINX are examples of stateless services, while databases are
-examples of stateful containers. The *Docker Volumes and Stateful
-Persistence* section will focus on volumes that are needed for database
-images to operate properly.
-
-In the following exercises, you will first create a stateless service
-and then a stateful one. Both will use the Docker playground, which is a
-website that offers Docker Engine in a matter of seconds. It is a free
-virtual machine in a browser, where you can execute Docker commands and
-create clusters in swarm mode.
 
 
 
@@ -779,7 +550,7 @@ playground to work in swarm mode:
 ![](./images/B15021_07_02.jpg)
     
 
-    Figure 7.2: The Docker playground
+
 
 2.  Click on `ADD NEW INSTANCE` in the left menu to create a
     new node. Get the node IP from the top node information section.
@@ -789,7 +560,7 @@ playground to work in swarm mode:
     allow other nodes, whether managers or workers, to join the cluster:
     
     ```
-    $docker swarm init --advertise-addr <IP>
+    docker swarm init --advertise-addr <IP>
     ```
     
 
@@ -815,7 +586,7 @@ playground to work in swarm mode:
 
     
     ```
-    $docker service ls
+    docker service ls
     ```
     
 
@@ -886,7 +657,7 @@ playground to work in swarm mode:
 
     
     ```
-    $docker service scale amazing_hellman=5
+    docker service scale amazing_hellman=5
     ```
     
 
@@ -910,7 +681,7 @@ playground to work in swarm mode:
 
     
     ```
-    $docker service ls
+    docker service ls
     ```
     
 
@@ -931,7 +702,7 @@ playground to work in swarm mode:
 
     
     ```
-    $docker service rm amazing_hellman
+    docker service rm amazing_hellman
     ```
     
 
@@ -948,7 +719,7 @@ playground to work in swarm mode:
 
     
     ```
-    $docker service ls
+    docker service ls
     ```
     
 
@@ -1057,7 +828,7 @@ the `via stack deploy` section. Select and copy the
 
     
     ```
-    $docker stack deploy -c stack.yml mysql
+    docker stack deploy -c stack.yml mysql
     ```
     
 
@@ -1080,13 +851,13 @@ the `via stack deploy` section. Select and copy the
 ![](./images/B15021_07_03.jpg)
     
 
-    Figure 7.3: Connecting to the service
+
 
 5.  Use the `docker stack ls` subcommand to list the stacks:
 
     
     ```
-    $docker stack ls
+    docker stack ls
     ```
     
 
@@ -1103,7 +874,7 @@ the `via stack deploy` section. Select and copy the
 
     
     ```
-    $docker stack rm mysql
+    docker stack rm mysql
     ```
     
 
@@ -1147,42 +918,6 @@ next section, we will learn about volumes to save persistent data.
 
 
 
-Docker Volumes and Stateful Persistence
-=======================================
-
-
-We can use volumes to save persistent data without relying on the
-containers. You can think of a volume as a shared folder. In any
-instance, if you mount the volume to any number of containers, the
-containers will be able to access the data in the volume. There are two
-ways to create a volume:
-
--   Create a volume as an independent entity outside any container by
-    using the `docker volume create` subcommand.
-
-    Creating a volume as an independent object from the container adds
-    flexibility to data management. These types of volumes are also
-    called **named volumes** because you specify a name for it, rather
-    than leaving the Docker Engine to generate an anonymous numeric one.
-    Named volumes outlive all the containers that are in the system and
-    preserve its data.
-
-    Despite these volumes being mounted to containers, the volumes will
-    not be deleted even when all the containers in the system are
-    deleted.
-
--   Create a volume by using the `--mount` or `-v`
-    or `--volume` options in the
-    `docker container run` subcommand. Docker creates an
-    anonymous volume for you. When the container is removed, the volume
-    will not be removed as well unless indicated explicitly by using the
-    `-v` option to the `docker container rm`
-    subcommand or using a `docker volume rm` subcommand.
-
-The following exercise will provide an example of each method.
-
-
-
 Exercise 7.05: Managing a Volume outside the Container\'s Scope and Mounting It to the Container
 ------------------------------------------------------------------------------------------------
 
@@ -1197,7 +932,7 @@ when you do not have a container on your system:
 
     
     ```
-    $docker volume create vol1
+    docker volume create vol1
     ```
     
 
@@ -1213,7 +948,7 @@ when you do not have a container on your system:
 
     
     ```
-    $docker volume ls
+    docker volume ls
     ```
     
 
@@ -1231,7 +966,7 @@ when you do not have a container on your system:
 
     
     ```
-    $docker volume inspect vol1
+    docker volume inspect vol1
     ```
     
 
@@ -1332,7 +1067,7 @@ when you do not have a container on your system:
 
     
     ```
-    $docker container rm -v container1
+    docker container rm -v container1
     ```
     
 
@@ -1348,7 +1083,7 @@ when you do not have a container on your system:
 
     
     ```
-    $docker volume ls
+    docker volume ls
     ```
     
 
@@ -1368,7 +1103,7 @@ when you do not have a container on your system:
 
     
     ```
-    $docker volume rm vol1
+    docker volume rm vol1
     ```
     
 
@@ -1385,7 +1120,7 @@ when you do not have a container on your system:
 
     
     ```
-    $docker volume ls
+    docker volume ls
     ```
     
 
@@ -1426,7 +1161,7 @@ how to remove it:
 
     
     ```
-    $docker container run -itd -v /newvol --name container2 ubuntu:14.04 bash
+    docker container run -itd -v /newvol --name container2 ubuntu:14.04 bash
     ```
     
 
@@ -1464,7 +1199,7 @@ how to remove it:
 
     
     ```
-    $docker container rm -fv container2
+    docker container rm -fv container2
     ```
     
 
@@ -1529,7 +1264,7 @@ exercise, you will run a PostgreSQL container with a database volume:
     container in detached mode:
     
     ```
-    $docker container run --name db1 -v db:/var/lib/postgresql/data -e POSTGRES_PASSWORD=password -d postgres
+    docker container run --name db1 -v db:/var/lib/postgresql/data -e POSTGRES_PASSWORD=password -d postgres
     ```
     
 
@@ -1580,7 +1315,7 @@ exercise, you will run a PostgreSQL container with a database volume:
 ![](./images/B15021_07_04.jpg)
     
 
-    Figure 7.4: Output of the SELECT statement
+
 
 6.  Exit the container to quit the database. The shell prompt will
     return:
@@ -1646,7 +1381,7 @@ exercise, you will run a PostgreSQL container with a database volume:
     mount the volume, `db`:
     
     ```
-    $docker container run --name db2 -v db:/var/lib/postgresql/data -e POSTGRES_PASSWORD=password -d postgres
+    docker container run --name db2 -v db:/var/lib/postgresql/data -e POSTGRES_PASSWORD=password -d postgres
     ```
     
 
@@ -1667,7 +1402,7 @@ exercise, you will run a PostgreSQL container with a database volume:
 ![](./images/B15021_07_05.jpg)
     
 
-    Figure 7.5: Output of the SELECT statement
+
 
 12. Exit the container to quit the database:
     
@@ -1775,7 +1510,7 @@ container:
 ![](./images/B15021_07_04.jpg)
     
 
-    Figure 7.6: Output of the SELECT statement
+
 
 6.  Exit the container to quit the database. The shell prompt will
     return:
@@ -1826,7 +1561,7 @@ container:
 
     
     ```
-    $docker volume ls
+    docker volume ls
     ```
     
 
@@ -1864,7 +1599,7 @@ some of which are described as follows:
 
     
     ```
-    $docker system df
+    docker system df
     ```
     
 
@@ -1887,7 +1622,7 @@ some of which are described as follows:
 
     
     ```
-    $docker system df -v
+    docker system df -v
     ```
     
 
@@ -1897,14 +1632,14 @@ some of which are described as follows:
 ![](./images/B15021_07_07.jpg)
     
 
-Figure 7.7: Output of the docker system df -v command
+
 
 -   Run the `docker volume ls` subcommand to list all the
     volumes that you have on your system:
 
     
     ```
-    $docker volume ls
+    docker volume ls
     ```
     
 
@@ -1925,7 +1660,7 @@ Figure 7.7: Output of the docker system df -v command
 
     
     ```
-    $docker ps -a --filter volume=db
+    docker ps -a --filter volume=db
     ```
     
 
@@ -1996,7 +1731,7 @@ will share volumes between containers using `--volume-from`:
     `newvol`, that is not shared with the host:
     
     ```
-    $docker container run -v /newvol --name c1 -it ubuntu:14.04 bash
+    docker container run -v /newvol --name c1 -it ubuntu:14.04 bash
     ```
     
 
@@ -2022,7 +1757,7 @@ will share volumes between containers using `--volume-from`:
     `--volumes-from` option:
     
     ```
-    $docker container run --name c2 --volumes-from c1 -it ubuntu:14.04 bash
+    docker container run --name c2 --volumes-from c1 -it ubuntu:14.04 bash
     ```
     
 
@@ -2216,7 +1951,7 @@ be engraved in the new image:
 1.  Create a new container with a volume:
     
     ```
-    $docker container run --name c1 -v /newvol -it ubuntu:14.04 bash
+    docker container run --name c1 -v /newvol -it ubuntu:14.04 bash
     ```
     
 
@@ -2480,111 +2215,6 @@ find the directory in the container and the data saved in it:
 In this exercise, you saw that data is uploaded to the image when the
 filesystem is used, compared to the situation we saw when data was saved
 on volumes.
-
-In the following activity, we will see how to save a container\'s
-statuses in a PostgreSQL database. So, if the container crashes, we will
-be able to retrace what happened. It will act as a black box. Moreover,
-you will query these events using SQL statements in the following
-activity.
-
-
-
-Activity 7.01: Storing Container Event (State) Data on a PostgreSQL Database
-----------------------------------------------------------------------------
-
-Logging and monitoring can be done in several ways in Docker. One of
-these methods is to use the `docker logs` command, which
-fetches what happens inside the individual container. Another is to use
-the `docker events` subcommand, which fetches everything that
-happens inside the Docker daemon in real-time. This feature is very
-powerful as it monitors all the objects\' events that are sent to the
-Docker server---not just the containers. The objects include containers,
-images, volumes, networks, nodes, and so on. Storing these events in a
-database is useful because they can be queried and analyzed to debug and
-troubleshoot any errors if generated.
-
-In this activity, you will be required to store a sample of a
-container\'s events\' output to a PostgreSQL database in
-`JSON` format by using the
-`docker events --format '{{json .}}'` command.
-
-Perform the following steps to complete this activity:
-
-1.  Clean your host by removing any Docker objects.
-
-2.  Open two terminals: one to see
-    `docker events --format '{{json .}}'` in effect and the
-    other to control the running container.
-
-3.  Click *Ctrl* + *C* in the `docker events` terminal to
-    terminate it.
-
-4.  Understand the JSON output structure.
-
-5.  Run the PostgreSQL container.
-
-6.  Create a table.
-
-7.  Copy the `docker events` subcommand output from the first
-    terminal.
-
-8.  Insert this JSON output into the PostgreSQL database.
-
-9.  Query the JSON data using the SQL `SELECT` statement with
-    the following SQL queries.
-
-    **Query 1**:
-
-    
-    ```
-    SELECT * FROM events WHERE info ->> 'status' = 'pull';
-    ```
-    
-
-    You should get the following output:
-
-    
-![](./images/B15021_07_08.jpg)
-    
-
-Figure 7.8: Output of Query 1
-
-**Query 2**:
-
-
-```
-SELECT * FROM events WHERE info ->> 'status' = 'destroy';
-```
-
-
-You will get an output like the following:
-
-
-
-![](./images/B15021_07_09.jpg)
-
-
-
-Figure 7.9: Output of Query 2
-
-**Query 3**:
-
-
-```
-SELECT info ->> 'id' as id FROM events WHERE info ->> status'     = 'destroy';
-```
-
-
-The final output should be similar to the following:
-
-
-
-![](./images/B15021_07_10.jpg)
-
-In the next activity, we will look at another example of sharing the
-container\'s NGINX log files, not just its events. You will also learn
-how to share log files between the container and the host.
-
 
 
 Activity 7.02: Sharing NGINX Log Files with the Host

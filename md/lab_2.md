@@ -1,5 +1,5 @@
-Getting Started with Dockerfiles
-===================================
+Lab 2: Getting Started with Dockerfiles
+=======================================
 
 **Overview**
 
@@ -410,8 +410,6 @@ reading Docker Beginner\'s Guide as the output:
 ![](./images/4.png)
     
 
-    Figure 2.3: Building the welcome:1.0 Docker image
-
 3.  Build this image again without changing the `Dockerfile`
     content:
 
@@ -427,8 +425,6 @@ reading Docker Beginner\'s Guide as the output:
     
 ![](./images/3.png)
     
-
-    Figure 2.4: Building the welcome:1.0 Docker image using the cache
 
 4.  Use the `docker image list` command to list all the Docker
     images available on your computer:
@@ -864,7 +860,7 @@ server on Ubuntu.
 ![](./images/B15021_02_08.jpg)
     
 
-    Figure 2.8: Building the user Docker image
+
 
 7.  Now, execute the `docker container` run command to start a
     new container from the Docker image that we built in the previous
@@ -1046,7 +1042,7 @@ underlying Docker host:
 ![](./images/B15021_02_11.jpg)
     
 
-    Figure 2.11: Inspecting the Docker container
+
 
 12. Inspect the volume with the
     `docker volume inspect <volume_name>` command.
@@ -1194,7 +1190,7 @@ and `HEALTHCHECK` directives to achieve this goal:
 ![](./images/B15021_02_16.jpg)
     
 
-    Figure 2.16: Apache home page
+
 
 10. Now, clean up the container. First, stop the Docker container by
     using the `docker container stop` command:
