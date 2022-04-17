@@ -206,7 +206,7 @@ should always be up and running.
     
 
 
-*Figure 5.9* shows the `index.html` page created by the
+Above image shows the `index.html` page created by the
 `init` container. In other words, it shows that
 `docker-compose` created the volume, mounted it to the
 containers, and started them successfully.
@@ -413,11 +413,9 @@ To complete the exercise, execute the following steps:
 ![](./images/B15021_05_13.jpg)
     
 
-
-
-    The output shows that Docker Compose creates the containers in the
-    order of `clean`, `init`, and then
-    `pre`.
+The output shows that Docker Compose creates the containers in the
+order of `clean`, `init`, and then
+`pre`.
 
 4.  Open `http://localhost:8080` in the browser:
 
@@ -425,11 +423,9 @@ To complete the exercise, execute the following steps:
 ![](./images/B15021_05_14.jpg)
     
 
-
-
-    The output from the server shows that the `clean`,
-    `init`, and `pre` containers work in the
-    expected order.
+The output from the server shows that the `clean`,
+`init`, and `pre` containers work in the
+expected order.
 
 5.  Return to the Terminal in *step 3* and use *Ctrl* + *C* to close the
     application gracefully. You will see some HTTP request logs and, in
@@ -488,10 +484,7 @@ Perform the following steps to complete this activity:
 ![](./images/B15021_05_16.jpg)
     
 
-
-
-You will then be able to reach the setup screen of WordPress in the
-browser:
+You will then be able to reach the setup screen of WordPress in the browser:
 
 
 ![](./images/B15021_05_17.jpg)
@@ -552,8 +545,6 @@ Perform the following steps to complete this activity:
 ![](./images/B15021_05_18.jpg)
     
 
-
-
 5.  Go to the administration section of the Panoramic Trekking App in
     the browser with the address `http://0.0.0.0:8000/admin`:
 
@@ -561,10 +552,8 @@ Perform the following steps to complete this activity:
 ![](./images/B15021_05_19.jpg)
     
 
-
-
-    You can log in with the username `admin` and password
-    `changeme` and add new photos and countries:
+You can log in with the username `admin` and password
+`changeme` and add new photos and countries:
 
     
 ![](./images/B15021_05_20.jpg)
