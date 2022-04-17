@@ -27,7 +27,7 @@ with the underlying infrastructure or the applications running on the
 container.
 
 
-Exercise 12.01: Understanding CPU Resources on Your Docker Image
+Exercise 10.01: Understanding CPU Resources on Your Docker Image
 ----------------------------------------------------------------
 
 In this exercise, you will first create a new Docker image that will
@@ -292,7 +292,7 @@ The next section will provide you with hands-on experience in analyzing
 the memory resources on your Docker image.
 
 
-Exercise 12.02: Analyzing Memory Resources on Your Docker Image
+Exercise 10.02: Analyzing Memory Resources on Your Docker Image
 ---------------------------------------------------------------
 
 This exercise will help you analyze how memory is used by your active
@@ -476,7 +476,7 @@ column that can be added to our table using the `BlockIO`
 value in our `docker stats` command, which represents the read
 and writes to our host disk drive or directories.
 
-Exercise 12.03: Understanding Disk Read and Write
+Exercise 10.03: Understanding Disk Read and Write
 -------------------------------------------------
 
 This exercise will allow you to become familiar with viewing the disk
@@ -1130,7 +1130,7 @@ best practices.
 
 
 
-Exercise 12.04: Linting Your Dockerfiles
+Exercise 10.04: Linting Your Dockerfiles
 ----------------------------------------
 
 This exercise will help you understand how to access and run
@@ -1376,7 +1376,7 @@ practices.
 
 
 
-Exercise 12.05: Validating Your docker-compose.yml File
+Exercise 10.05: Validating Your docker-compose.yml File
 -------------------------------------------------------
 
 Docker already has a tool to validate your

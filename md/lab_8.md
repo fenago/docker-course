@@ -16,7 +16,7 @@ services and clusters.
 
 
 
-Exercise 9.01: Running Services with Docker Swarm
+Exercise 8.01: Running Services with Docker Swarm
 -------------------------------------------------
 
 This exercise is designed to help you become familiar with using the
@@ -426,7 +426,7 @@ will explain what is happening as we move through the exercise.
 
 
 
-Exercise 9.02: Deploying Your Swarm from Docker Compose
+Exercise 8.02: Deploying Your Swarm from Docker Compose
 -------------------------------------------------------
 
 In the following exercise, you will use `docker-compose.yml`
@@ -950,7 +950,7 @@ and secrets in your current Docker Swarm environment.
 
 
 
-Exercise 9.03: Implementing Configurations and Secrets in Your Swarm
+Exercise 8.03: Implementing Configurations and Secrets in Your Swarm
 --------------------------------------------------------------------
 
 In this exercise, you will expand your Docker Swarm environment further.
@@ -1572,7 +1572,7 @@ your running system and start to manage your installed services.
 
 
 
-Exercise 9.04: Installing Swarmpit and Managing Your Stacks
+Exercise 8.04: Installing Swarmpit and Managing Your Stacks
 -----------------------------------------------------------
 
 In this exercise, you will install and run Swarmpit, briefly explore the
@@ -1773,9 +1773,7 @@ web interface, and begin managing your services from your web browser:
 ![](./images/B15021_09_09.jpg)
     
 
-
-
-Note
+**Note**
 
 Note that Swarmpit will allow you to delete the `swarmpit`
 stack. You will see an error, but when you try to reload the page, it
@@ -1792,7 +1790,7 @@ lab are designed to help expand your knowledge further.
 
 
 
-Activity 9.01: Deploying the Panoramic Trekking App to a Single-Node Docker Swarm
+Activity 8.01: Deploying the Panoramic Trekking App to a Single-Node Docker Swarm
 ---------------------------------------------------------------------------------
 
 You are required to use Docker Swarm to deploy web and database services
@@ -1823,38 +1821,6 @@ k6kh…    activity_swarm_db   replicated   1/1
 copa…    activity_swarm_web  replicated   1/1
   activity_web:latest  
 ```
-
-
-Continue with the next activity as this will work to solidify some of
-the information you have already learned in this lab.
-
-
-
-Activity 9.02: Performing an Update to the App While the Swarm Is Running
--------------------------------------------------------------------------
-
-In this activity, you need to make a minor change to the Panoramic
-Trekking App that will allow you to build a new image and deploy the
-image to the running Swarm. In this activity, you will perform a rolling
-update to deploy these changes to your Swarm cluster.
-
-The steps you\'ll need to complete this activity are as follows:
-
-1.  If you do not have the Swarm from *Activity 9.01, Deploying the
-    Panoramic Trekking App to a Single Node Docker Swarm* still running,
-    deploy the swarm again.
-
-2.  Make a minor change to the code in the Panoramic Trekking
-    App---something small that can be tested to verify that you have
-    made a change in your environment. The change you are making is not
-    important, so it can be something as basic as a configuration
-    change. The main focus of this activity is on performing the rolling
-    update to the service.
-
-3.  Build a new image to be deployed into the running environment.
-
-4.  Perform an update to the environment and verify that the changes
-    were successful.
 
 
 

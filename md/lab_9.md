@@ -14,7 +14,7 @@ client tools, and use fundamental Kubernetes resources to run
 containerized applications.
 
 
-Exercise 10.01: Starting a Local Kubernetes Cluster
+Exercise 9.01: Starting a Local Kubernetes Cluster
 ---------------------------------------------------
 
 To complete this exercise, perform the following steps:
@@ -148,7 +148,7 @@ created in this section.
 
 
 
-Exercise 10.02: Accessing Kubernetes Clusters with kubectl
+Exercise 9.02: Accessing Kubernetes Clusters with kubectl
 ----------------------------------------------------------
 
 Kubernetes clusters are installed in cloud systems and can be accessed
@@ -276,7 +276,7 @@ In the following exercise, you will see the Kubernetes resources in
 action using `kubectl` and the local Kubernetes cluster.
 
 
-Exercise 10.03: Kubernetes Resources in Action
+Exercise 9.03: Kubernetes Resources in Action
 ----------------------------------------------
 
 Cloud-native containerized applications require multiple Kubernetes
