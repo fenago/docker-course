@@ -36,19 +36,11 @@ size of the final Docker image:
 
 3.  Within the `normal-build` directory, create a file named
     `welcome.go`. This file will be copied to the Docker image
-    during the build time:
-    
-    ```
-    $ touch welcome.go
-    ```
+    during the build time.
     
 
 4.  Now, open the `welcome.go` file using your favorite text
-    editor:
-    
-    ```
-    $ vim welcome.go
-    ```
+    editor.
     
 
 5.  Add the following content to the `welcome.go` file, save
@@ -69,19 +61,11 @@ size of the final Docker image:
     `"Welcome to multi-stage Docker builds"` on execution.
 
 6.  Within the `normal-build` directory, create a file named
-    `Dockerfile`:
-    
-    ```
-    $ touch Dockerfile
-    ```
+    `Dockerfile`.
     
 
 7.  Now, open the `Dockerfile` using your favorite text
-    editor:
-    
-    ```
-    $ vim Dockerfile 
-    ```
+    editor.
     
 
 8.  Add the following content to the `Dockerfile` and save the
@@ -177,20 +161,11 @@ exercise, you will optimize the Docker image using the builder pattern:
 
 3.  Within the `builder-pattern` directory, create a file
     named `welcome.go`. This file will be copied to the Docker
-    image at build time:
-    
-    ```
-    $ touch welcome.go
-    ```
+    image at build time.
     
 
 4.  Now, open the `welcome.go` file using your favorite text
-    editor:
-    
-    ```
-    $ vim welcome.go
-    ```
-    
+    editor.
 
 5.  Add the following content to the `welcome.go` file, and
     then save and exit this file:
@@ -212,19 +187,11 @@ exercise, you will optimize the Docker image using the builder pattern:
 6.  Within the `builder-pattern` directory, create a file
     named `Dockerfile.build`. This file will contain all the
     instructions that you are going to use to create the
-    `build` Docker image:
-    
-    ```
-    $ touch Dockerfile.build
-    ```
+    `build` Docker image.
     
 
 7.  Now, open the `Dockerfile.build` using your favorite text
-    editor:
-    
-    ```
-    $ vim Dockerfile.build
-    ```
+    editor.
     
 
 8.  Add the following content to the `Dockerfile.build` file
@@ -248,19 +215,11 @@ exercise, you will optimize the Docker image using the builder pattern:
     Within the `builder-pattern` directory, create a file
     named `Dockerfile`. This file will contain all the
     instructions that you are going to use to create the runtime Docker
-    image:
-    
-    ```
-    $ touch Dockerfile
-    ```
+    image.
     
 
 10. Now, open the `Dockerfile` using your favorite text
-    editor:
-    
-    ```
-    $ vim Dockerfile
-    ```
+    editor.
     
 
 11. Add the following content to the `Dockerfile` and save the
@@ -285,19 +244,11 @@ exercise, you will optimize the Docker image using the builder pattern:
 12. Create the shell script to copy the executables between Docker
     containers. Within the `builder-pattern` directory, create
     a file named `build.sh`. This file will contain the steps
-    to coordinate the build process between the two Docker containers:
-    
-    ```
-    $ touch build.sh
-    ```
+    to coordinate the build process between the two Docker containers.
     
 
 13. Now, open the `build.sh` file using your favorite text
-    editor:
-    
-    ```
-    $ vim build.sh
-    ```
+    editor.
     
 
 14. Add the following content to the shell script and save the file:
@@ -567,19 +518,11 @@ process. In this exercise, you are going to use a multi-stage
 
 3.  Within the `multi-stage` directory, create a file named
     `welcome.go`. This file will be copied to the Docker image
-    during the build time:
-    
-    ```
-    $ touch welcome.go
-    ```
+    during the build time.
     
 
 4.  Now, open the `welcome.go` file using your favorite text
-    editor:
-    
-    ```
-    $ vim welcome.go
-    ```
+    editor.
     
 
 5.  Add the following content to the `welcome.go` file, and
@@ -601,20 +544,11 @@ process. In this exercise, you are going to use a multi-stage
 
     Within the multi-stage directory, create a file named
     `Dockerfile`. This file will be the multi-stage
-    `Dockerfile`:
-
-    
-    ```
-    touch Dockerfile
-    ```
+    `Dockerfile`.
     
 
 6.  Now, open the `Dockerfile` using your favorite text
-    editor:
-    
-    ```
-    vim Dockerfile
-    ```
+    editor.
     
 
 7.  Add the following content to the `Dockerfile` and save the

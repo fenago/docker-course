@@ -523,11 +523,11 @@ services manually:
     `web` services in your `docker-compose.yml`. The
     command will then run `django-admin startproject`, which
     will create your basic Django project, named
-    `chapter_nine`:
+    `lab_eight`:
 
     
     ```
-    docker-compose run web django-admin startproject chapter_nine .
+    docker-compose run web django-admin startproject lab_eight .
     ```
     
 
@@ -560,13 +560,13 @@ services manually:
     You previously created the `Dockerfile`,
     `docker-compose.yml` file, and
     `requirements.txt` file, but now the build of the
-    container has added the `chapter_nine` Django directory
+    container has added the `lab_eight` Django directory
     and the `manage.py` file:
 
     
     ```
     -rw-r--r--  1 user  staff  175  3 Mar 13:45 Dockerfile
-    drwxr-xr-x  6 user  staff  192  3 Mar 13:48 chapter_nine
+    drwxr-xr-x  6 user  staff  192  3 Mar 13:48 lab_eight
     -rw-r--r--  1 user  staff  304  3 Mar 13:46 docker-compose.yml
     -rwxr-xr-x  1 user  staff  634  3 Mar 13:48 manage.py
     -rw-r--r--  1 user  staff   36  3 Mar 13:46 requirements.txt
@@ -575,7 +575,7 @@ services manually:
 
 8.  To get your basic application running, you need to make some minor
     changes to the Django project settings. Open the
-    `chapter_nine/settings.py` file with your text editor and
+    `lab_eight/settings.py` file with your text editor and
     locate the entry that starts with `DATABASES`. This
     controls how Django will connect to your database, and by default,
     Django is set up to work with an SQLite database. The
@@ -990,13 +990,13 @@ deploy and configure services more efficiently:
     `docker-compose.yml` file with your text editor and change
     *line 13* to run the `gunicorn` application, instead of
     the Django `manage.py runserver` command. The following
-    `gunicorn` command runs the `chapter_nine`
+    `gunicorn` command runs the `lab_eight`
     Django project via its WSGI service and binds to IP address and port
     `0.0.0.0:8000`:
     
     ```
     12     image: swarm_web:latest
-    13     command: gunicorn chapter_nine.wsgi:application          --bind 0.0.0.0:8000
+    13     command: gunicorn lab_eight.wsgi:application          --bind 0.0.0.0:8000
     14     volumes:
     ```
     
@@ -1049,7 +1049,7 @@ deploy and configure services more efficiently:
     10   web:
     11     build: .
     12     image: swarm_web:latest
-    13     command: gunicorn chapter_nine.wsgi:application          --bind 0.0.0.0:8000
+    13     command: gunicorn lab_eight.wsgi:application          --bind 0.0.0.0:8000
     14     volumes:
     15       - .:/application
     16     ports:
@@ -1115,13 +1115,13 @@ deploy and configure services more efficiently:
 
     
     ```
-    upstream chapter_nine {
+    upstream lab_eight {
         server web:8000;
     }
     server {
         listen 80;
         location / {
-            proxy_pass http://chapter_nine;
+            proxy_pass http://lab_eight;
             proxy_set_header X-Forwarded-For             $proxy_add_x_forwarded_for;
             proxy_set_header Host $host;
             proxy_redirect off;
@@ -1132,7 +1132,7 @@ deploy and configure services more efficiently:
 
     If you\'re unfamiliar with NGINX configurations, the preceding
     details are simply looking for requests to the web service and will
-    route requests through to the `chapter_nine` Django
+    route requests through to the `lab_eight` Django
     application.
 
 11. With all the details now in place, build your new image for the
@@ -1263,13 +1263,13 @@ deploy and configure services more efficiently:
     Created at:          2020-03-04 19:55:52.168746807 +0000 utc
     Updated at:          2020-03-04 19:55:52.168746807 +0000 utc
     Data:
-    upstream chapter_nine {
+    upstream lab_eight {
         server web:8000;
     }
     server {
         listen 80;
         location / {
-            proxy_pass http://chapter_nine;
+            proxy_pass http://lab_eight;
             proxy_set_header X-Forwarded-For             $proxy_add_x_forwarded_for;
             proxy_set_header Host $host;
             proxy_redirect off;
@@ -1480,7 +1480,7 @@ deploy and configure services more efficiently:
       web:
         build: .
         image: swarm_web:latest
-        command: gunicorn chapter_nine.wsgi:application --bind        0.0.0.0:8000
+        command: gunicorn lab_eight.wsgi:application --bind  0.0.0.0:8000
         volumes:
           - .:/application
         ports:
@@ -1527,12 +1527,6 @@ Swarmpit.
 
 
 
-
-
-
-
-
-
 Managing Swarm with Swarmpit
 ============================
 
@@ -1549,12 +1543,6 @@ that allows you to manage most aspects of your Docker Swarm instances,
 including the stacks, secrets, services, volumes networks, and
 configurations.
 
-Note
-
-This lab will only touch on the use of Swarmpit, but if you would
-like more information on the application, the following site should
-provide you with further details:
-[https://swarmpit.io](https://swarmpit.io/).
 
 Swarmpit is a simple-to-use installation Docker image that, when run on
 your system, creates its swarm of services deployed in your environment

@@ -559,7 +559,7 @@ Perform the following steps to complete this activity:
 
 3.  Create a service for the Panoramic Trekking App defined in the
     `docker-compose.yaml` file. Ensure that you are using the
-    `packtworkshops/the-docker-workshop:chapter5-pta-web`
+    `fenago/docker-course:lab5-pta-web`
     Docker image, which is prebuilt and ready to use from the registry.
     In addition, since the application is dependent on the database, you
     should configure the container to start after the database. To store
@@ -569,7 +569,7 @@ Perform the following steps to complete this activity:
 
     Finally, create a service for `nginx` and ensure that you
     are using the
-    `packtworkshops/the-docker-workshop:chapter5-pta-nginx`
+    `fenago/docker-course:lab5-pta-nginx`
     Docker image from the registry. Ensure that the `nginx`
     container starts after the Panoramic Trekking App container. You
     also need to mount the same `static_data` volume to the

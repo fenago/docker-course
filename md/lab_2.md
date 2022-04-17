@@ -49,19 +49,10 @@ value:
     
 
 3.  Within the `custom-docker-image` directory, create a file
-    named `Dockerfile` using the `touch` command:
-    
-    ```
-    $ touch Dockerfile
-    ```
-    
+    named `Dockerfile`.
 
 4.  Now, open the `Dockerfile` using your favorite text
-    editor:
-    
-    ```
-    $ vim Dockerfile
-    ```
+    editor.
     
 
 5.  Add the following content to the `Dockerfile`, save it,
@@ -534,19 +525,11 @@ exercise:
     
 
 3.  Within the `env-arg-exercise` directory, create a file
-    named `Dockerfile`:
-    
-    ```
-    touch Dockerfile
-    ```
+    named `Dockerfile`.
     
 
 4.  Now, open the `Dockerfile` using your favorite text
-    editor:
-    
-    ```
-    vim Dockerfile
-    ```
+    editor.
     
 
 5.  Add the following content to the `Dockerfile`. Then, save
@@ -651,19 +634,11 @@ website) to be used with the custom index.html file:
 
 3.  Within the `workdir-copy-add-exercise` directory, create a
     file named `index.html`. This file will be copied to the
-    Docker image during build time:
-    
-    ```
-    touch index.html 
-    ```
-    
+    Docker image during build time.
 
-4.  Now, open `index.html` using your favorite text editor:
-    
-    ```
-    vim index.html 
-    ```
-    
+
+4.  Now, open `index.html` using your favorite text editor.
+
 
 5.  Add the following content to the `index.html` file, save
     it, and exit from `index.html`:
@@ -687,19 +662,11 @@ website) to be used with the custom index.html file:
     width of `500`.
 
 6.  Within the `workdir-copy-add-exercise` directory, create a
-    file named `Dockerfile`:
-    
-    ```
-    touch Dockerfile
-    ```
+    file named `Dockerfile`.
     
 
 7.  Now, open the `Dockerfile` using your favorite text
-    editor:
-    
-    ```
-    vim Dockerfile
-    ```
+    editor.
     
 
 8.  Add the following content to the `Dockerfile`, save it,
@@ -808,19 +775,11 @@ server on Ubuntu.
     
 
 3.  Within the `user-exercise` directory, create a file named
-    `Dockerfile`:
-    
-    ```
-    touch Dockerfile
-    ```
+    `Dockerfile`.
     
 
 4.  Now, open the `Dockerfile` using your favorite text
-    editor:
-    
-    ```
-    vim Dockerfile
-    ```
+    editor.
     
 
 5.  Add the following content to the `Dockerfile`, save it,
@@ -914,19 +873,11 @@ underlying Docker host:
     
 
 3.  Within the `volume-exercise` directory, create a file
-    named `Dockerfile`:
-    
-    ```
-    touch Dockerfile
-    ```
+    named `Dockerfile`.
     
 
 4.  Now, open the `Dockerfile` using your favorite text
-    editor:
-    
-    ```
-    vim Dockerfile
-    ```
+    editor.
     
 
 5.  Add the following content to the `Dockerfile`, save it,
@@ -1096,19 +1047,11 @@ and `HEALTHCHECK` directives to achieve this goal:
     
 
 3.  Within the `expose-healthcheck` directory, create a file
-    named `Dockerfile`:
-    
-    ```
-    touch Dockerfile
-    ```
+    named `Dockerfile`.
     
 
 4.  Now, open the `Dockerfile` using your favorite text
-    editor:
-    
-    ```
-    vim Dockerfile
-    ```
+    editor.
     
 
 5.  Add the following content to the `Dockerfile`, save it,
@@ -1247,19 +1190,11 @@ parent image to deploy and test any HTML files created by them:
     
 
 3.  Within the `onbuild-parent` directory, create a file named
-    `Dockerfile`:
-    
-    ```
-    touch Dockerfile
-    ```
+    `Dockerfile`.
     
 
 4.  Now, open the `Dockerfile` using your favorite text
-    editor:
-    
-    ```
-    vim Dockerfile
-    ```
+    editor.
     
 
 5.  Add the following content to the `Dockerfile`, save it,

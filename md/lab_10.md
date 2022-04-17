@@ -671,11 +671,6 @@ practices.
 
 
 
-
-
-
-
-
 Best Practices in Docker
 ========================
 
@@ -690,12 +685,6 @@ will give you a clearer understanding. In the meantime, let\'s look into
 some of the more important best practices to keep in mind when you are
 creating your Docker images and how your applications should be working
 with them.
-
-Note
-
-This lab may cover some points from previous chapters, but we will
-be able to give you more information and clarity on why we are using
-these practices.
 
 In the following section, we will run through some of the more common
 best practices you should be following when creating your services and
@@ -1236,12 +1225,7 @@ the warnings we receive:
 
 4.  `hadolint` also allows you to create a configuration file
     to add any warnings to be ignored, as well as specifying them on the
-    command line. Create a file named `.hadolint.yml` using
-    the `touch` command:
-    
-    ```
-    touch .hadolint.yml
-    ```
+    command line. Create a file named `.hadolint.yml`.
     
 
 5.  Open the configuration file with your text editor and enter in and
@@ -1440,12 +1424,7 @@ required before starting:
 
 4.  Create a `docker-compose` file from scratch that will use
     some of the images you have already created in this lab. Create
-    a `docker-compose.yml` file by using the `touch`
-    command:
-    
-    ```
-    touch docker-compose.yml
-    ```
+    a `docker-compose.yml` file.
     
 
 5.  Open your favorite text editor to edit the

@@ -1153,11 +1153,7 @@ again:
 
 10. Create a build script to both build and tag your image. Call this
     `build.sh` and it will reside in the same directory as
-    your `Dockerfile` and `VERSION` file:
-    
-    ```
-    touch build.sh
-    ```
+    your `Dockerfile` and `VERSION` file.
     
 
 11. Add the following details to `build.sh`. *Line 3* will be
@@ -1169,15 +1165,15 @@ again:
     your new semantic version:
     
     ```
-    1 set -ex
-    2
-    3 USER=<your_user_name>
-    4 SERVICENAME=basic-app
-    5
-    6 version=`cat VERSION`
-    7 echo "version: $version"
-    8
-    9 docker build -t $USER/$SERVICENAME:$version .
+    set -ex
+    
+    USER=<your_user_name>
+    SERVICENAME=basic-app
+    
+    version=`cat VERSION`
+    echo "version: $version"
+    
+    docker build -t $USER/$SERVICENAME:$version .
     ```
     
 
