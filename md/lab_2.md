@@ -31,11 +31,7 @@ value:
     the `mkdir` command. This directory will be the
     **context** for your Docker image. `Context` is the
     directory that contains all the files needed to successfully build
-    an image:
-    
-    ```
-    $ mkdir custom-docker-image
-    ```
+    an image.
     
 
 2.  Navigate to the newly created `custom-docker-image`
@@ -44,7 +40,7 @@ value:
     `Dockerfile`) within this directory:
     
     ```
-    $ cd custom-docker-image
+    cd custom-docker-image
     ```
     
 

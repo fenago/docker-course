@@ -20,17 +20,12 @@ Docker Compose CLI
 Test the CLI and installation with the following command in the terminal on all operating systems:
 
     
-    ```
-    docker-compose version
-    ```
-    
+```
+docker-compose version
+```
 
-    If it is installed correctly, you will see the versions of the CLI
-    and its dependencies as follows. For instance, in the following
-    output, the `docker-compose` CLI has version
-    and its dependencies, `docker-py`,
-    `CPython`, and `OpenSSL`, are also listed with
-    their versions:
+
+If it is installed correctly, you will see the versions of the CLI as follows.
 
     
 ![](./images/B15021_05_01.jpg)
@@ -56,20 +51,7 @@ docker-compose --help
 The output of the command should look like the following:
 
 
-
 ![](./images/B15021_05_02.jpg)
-
-
-
-
-
-There are three essential `docker-compose` commands that are
-used to manage the life cycle of applications. The life cycle and
-commands can be illustrated as follows:
-
-
-
-![](./images/B15021_05_03.jpg)
 
 
 
@@ -119,8 +101,7 @@ To complete the exercise, execute the following steps:
     ```
     
 
-    This script generates a sample HTML page with the `echo`
-    commands.
+This script generates a sample HTML page with the `echo` commands.
 
 4.  Create a `Dockerfile` with the name `Dockerfile`
     and the following content:
@@ -191,36 +172,31 @@ To complete the exercise, execute the following steps:
 
 
 
-    The preceding command creates and starts the containers in
-    `detached` mode. It starts by creating the
-    `server-with-compose_default` network and the
-    `server-with-compose_static` volume. Then, it builds the
-    `init` container using the `Dockerfile` from
-    *step 4*, downloads the `nginx` Docker image for the
-    server, and starts the containers. Finally, it prints the names of
-    the containers and makes them run in the background.
+The preceding command creates and starts the containers in
+`detached` mode. It starts by creating the
+`server-with-compose_default` network and the
+`server-with-compose_static` volume. Then, it builds the
+`init` container using the `Dockerfile` from
+*step 4*, downloads the `nginx` Docker image for the
+server, and starts the containers. Finally, it prints the names of
+the containers and makes them run in the background.
 
-    Note
-
-    You can disregard the warning about Swarm mode since we want to
-    deploy all containers to the same node.
+**Note:** You can disregard the warning about Swarm mode since we want to
+deploy all containers to the same node.
 
 7.  Check the status of the application with the
     `docker-compose ps` command:
 
     
 ![](./images/B15021_05_08.jpg)
-    
 
-
-
-    This output lists two containers. The `init` container
-    exited successfully with code `0`, while the
-    `server` container is `Up` and its port is
-    available. This is the expected output since the `init`
-    container is designed to prepare the `index.html` file and
-    complete its operations, whereas the `server` container
-    should always be up and running.
+This output lists two containers. The `init` container
+exited successfully with code `0`, while the
+`server` container is `Up` and its port is
+available. This is the expected output since the `init`
+container is designed to prepare the `index.html` file and
+complete its operations, whereas the `server` container
+should always be up and running.
 
 8.  Open `http://localhost:8080` in the browser. The following
     figure shows the output:
@@ -230,22 +206,21 @@ To complete the exercise, execute the following steps:
     
 
 
-
-    *Figure 5.9* shows the `index.html` page created by the
-    `init` container. In other words, it shows that
-    `docker-compose` created the volume, mounted it to the
-    containers, and started them successfully.
+*Figure 5.9* shows the `index.html` page created by the
+`init` container. In other words, it shows that
+`docker-compose` created the volume, mounted it to the
+containers, and started them successfully.
 
 9.  Stop and remove all the resources with the following command if you
     do not need the application up and running:
 
     
-    ```
-    docker-compose down
-    ```
-    
+```
+docker-compose down
+```
 
-    The command will return output like the following:
+
+The command will return output like the following:
 
     
 ![](./images/B15021_05_10.jpg)
@@ -358,16 +333,9 @@ configured with different methods. Using Docker Compose files,
 environment definition files and exported values can be used to deploy
 the same application to different platforms.
 
-Since Docker Compose manages multi-container applications, there is a
-need to define the interdependencies between them. The interdependencies
-of the containers in the Docker Compose applications will be presented
-in the following section.
-
-
 
 In the following exercise, the order of containers will be used to fill
 the contents of a file and then serve it with a web server.
-
 
 
 Exercise 5.03: Service Dependency with Docker Compose

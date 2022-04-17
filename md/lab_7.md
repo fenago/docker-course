@@ -1042,7 +1042,7 @@ when you do not have a container on your system:
 
     
     ```
-    $ sudo ls /var/lib/docker/volumes/vol1/_data
+    sudo ls /var/lib/docker/volumes/vol1/_data
     ```
     
 
@@ -1058,7 +1058,7 @@ when you do not have a container on your system:
     is saved as well by running the following command:
     
     ```
-    $ sudo cat /var/lib/docker/volumes/vol1/_data/new_file.txt
+    sudo cat /var/lib/docker/volumes/vol1/_data/new_file.txt
     ```
     
 

@@ -58,7 +58,7 @@ infrastructure:
 
     
     ```
-    $ ifconfig 
+    ifconfig 
     ```
     
 
@@ -165,7 +165,7 @@ infrastructure:
 
     
     ```
-    $ curl 172.17.0.2:80
+    curl 172.17.0.2:80
     ```
     
 
@@ -700,7 +700,7 @@ service:
 
     
     ```
-    $ ifconfig
+    ifconfig
     ```
     
 
@@ -1011,7 +1011,7 @@ start with the `bridge` network and then look into the
 
     
     ```
-    $ ifconfig
+    ifconfig
     ```
     
 
@@ -1230,7 +1230,7 @@ start with the `bridge` network and then look into the
 
     
     ```
-    / $ ip a 
+    ip a 
     ```
     
 
@@ -1293,7 +1293,7 @@ start with the `bridge` network and then look into the
 
     
     ```
-    $ ifconfig
+    ifconfig
     ```
     
 

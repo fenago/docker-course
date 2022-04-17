@@ -20,17 +20,13 @@ image using the normal build process. You will then observe the image
 size of the final Docker image:
 
 1.  Create a new directory named `normal-build` for this
-    exercise:
-    
-    ```
-    $ mkdir normal-build
-    ```
+    exercise.
     
 
 2.  Navigate to the newly created `normal-build` directory:
     
     ```
-    $ cd normal-build
+    cd normal-build
     ```
     
 
@@ -120,7 +116,7 @@ size of the final Docker image:
     
 
 It can be observed in the preceding output that the image size of the
-`welcome:v1` image is `805MB`.
+`welcome:v1` image.
 
 In this section, we discussed how to use the normal Docker build process
 to build a Docker image and observed its size. The result was a huge
@@ -145,17 +141,13 @@ create a minimal-sized Docker image to run the application. In this
 exercise, you will optimize the Docker image using the builder pattern:
 
 1.  Create a new directory named `builder-pattern` for this
-    exercise:
-    
-    ```
-    $ mkdir builder-pattern
-    ```
+    exercise.
     
 
 2.  Navigate to the newly created `builder-pattern` directory:
     
     ```
-    $ cd builder-pattern
+    cd builder-pattern
     ```
     
 
@@ -171,13 +163,13 @@ exercise, you will optimize the Docker image using the builder pattern:
     then save and exit this file:
 
     
-    ```
-    package main
-    import "fmt"
-    func main() {
-        fmt.Println("Welcome to multi-stage Docker builds")
-    }
-    ```
+```
+package main
+import "fmt"
+func main() {
+	fmt.Println("Welcome to multi-stage Docker builds")
+}
+```
     
 
     This is a simple `hello world` application written in
@@ -198,13 +190,13 @@ exercise, you will optimize the Docker image using the builder pattern:
     and save the file:
 
     
-    ```
-    FROM golang:1.15.6
-    WORKDIR /myapp
-    COPY welcome.go .
-    RUN go build -o welcome .
-    ENTRYPOINT ["./welcome"]
-    ```
+```
+FROM golang:1.15.6
+WORKDIR /myapp
+COPY welcome.go .
+RUN go build -o welcome .
+ENTRYPOINT ["./welcome"]
+```
     
 
     This has the same content that you created for the
@@ -226,12 +218,12 @@ exercise, you will optimize the Docker image using the builder pattern:
     file:
 
     
-    ```
-    FROM scratch
-    WORKDIR /myapp
-    COPY welcome .
-    ENTRYPOINT ["./welcome"]
-    ```
+```
+FROM scratch
+WORKDIR /myapp
+COPY welcome .
+ENTRYPOINT ["./welcome"]
+```
     
 
     This `Dockerfile` uses the scratch image, which is the
@@ -277,7 +269,7 @@ exercise, you will optimize the Docker image using the builder pattern:
 15. Add execution permissions to the `build.sh` shell script:
     
     ```
-    $ chmod +x build.sh
+    chmod +x build.sh
     ```
     
 
@@ -287,12 +279,11 @@ exercise, you will optimize the Docker image using the builder pattern:
 
     
     ```
-    $ ./build.sh
+    ./build.sh
     ```
     
 
-    The image will be successfully built and tagged as
-    `welcome-runtime:v1`:
+The image will be successfully built and tagged as `welcome-runtime:v1`:
 
     
 ![](./images/B15021_04_04.jpg)
@@ -304,13 +295,13 @@ exercise, you will optimize the Docker image using the builder pattern:
     images available on your computer:
 
     
-    ```
-    docker image ls
-    ```
-    
+```
+docker image ls
+```
 
-    You should get the list of all the available Docker images as shown
-    in the following figure:
+
+You should get the list of all the available Docker images as shown
+in the following figure:
 
     
 ![](./images/B15021_04_05.jpg)
@@ -318,7 +309,7 @@ exercise, you will optimize the Docker image using the builder pattern:
 
 As you can see from the preceding output, there are two Docker images
 available. welcome-builder has all the builds tools and is 805 MB, while
-welcome-runtime has a significantly lower image size of 2.01 MB.
+welcome-runtime has a significantly lower image size of 4.01 MB.
 `golang:1.15.6` is the Docker image we used as the parent
 image of `welcome-builder`.
 
@@ -334,19 +325,6 @@ multi-stage `Dockerfile`.
 Introduction to Multi-Stage Dockerfiles
 =======================================
 
-
-**Multi-stage Dockerfiles** are a feature that allows for a single
-`Dockerfile` to contain multiple stages that can produce
-optimized Docker images. As we observed with the builder pattern in the
-previous section, the stages will usually include a builder state to
-build the executables from source code, and a runtime stage to run the
-executables. Multi-stage `Dockerfiles` will use multiple
-`FROM` directives within the `Dockerfile` for each
-stage, and each stage will start with a different base image. Only the
-essential files will be copied selectively from one stage to the other.
-Before multi-stage `Dockerfiles`, this was achieved with the
-builder pattern, as we discussed in the previous section.
-
 Multi-stage Docker builds allow us to create minimal-sized Docker images
 that are similar to the builder pattern but eliminate the problems
 associated with it. As we have seen in the previous example, the builder
@@ -360,8 +338,7 @@ multi-stage Docker builds as we can use the `--from` flag to
 copy the executables between Docker images without copying them to the
 Docker host.
 
-Now, let\'s observe the structure of a multi-stage
-`Dockerfile`:
+Now, let\'s observe the structure of a multi-stage `Dockerfile`:
 
 
 ```
@@ -392,6 +369,17 @@ does not contain anything from the previous image other than the
 selectively copied executables. `COPY --from=0` is used to
 copy the executable from the first stage to the second stage.
 
+Create `helloworld.go` and add following code in the file:
+
+    
+```
+package main
+import "fmt"
+func main() {
+    fmt.Println("Welcome to multi-stage Docker builds")
+}
+```
+
 Build the Docker image and tag the image as `multi-stage:v1`:
 
 
@@ -412,11 +400,6 @@ multi-stage   latest   75e1f4bcabd0   7 seconds ago   7.6MB
 You can see that this has resulted in a Docker image of the same size
 that we observed with the builder pattern.
 
-Note
-
-Multi-stage `Dockerfiles` reduce the number of
-`Dockerfiles` required and eliminate the shell script without
-making any difference to the size of the image.
 
 By default, the stages in the multi-stage `Dockerfile` are
 referred to by an integer number, starting with `0` from the
@@ -529,22 +512,22 @@ process. In this exercise, you are going to use a multi-stage
     then save and exit this file:
 
     
-    ```
-    package main
-    import "fmt"
-    func main() {
-        fmt.Println("Welcome to multi-stage Docker builds")
-    }
-    ```
+```
+package main
+import "fmt"
+func main() {
+    fmt.Println("Welcome to multi-stage Docker builds")
+}
+```
     
 
-    This is a simple `hello world` application written in
-    Golang. This will output
-    `"Welcome to multi-stage Docker builds"` once executed.
+This is a simple `hello world` application written in
+Golang. This will output
+`"Welcome to multi-stage Docker builds"` once executed.
 
-    Within the multi-stage directory, create a file named
-    `Dockerfile`. This file will be the multi-stage
-    `Dockerfile`.
+Within the multi-stage directory, create a file named
+`Dockerfile`. This file will be the multi-stage
+`Dockerfile`.
     
 
 6.  Now, open the `Dockerfile` using your favorite text
@@ -555,44 +538,44 @@ process. In this exercise, you are going to use a multi-stage
     file:
 
     
-    ```
-    FROM golang:1.15.6 AS builder
-    WORKDIR /myapp
-    COPY welcome.go .
-    RUN go build -o welcome .
-    FROM scratch
-    WORKDIR /myapp
-    COPY --from=builder /myapp/welcome .
-    ENTRYPOINT ["./welcome"]
-    ```
+```
+FROM golang:1.15.6 AS builder
+WORKDIR /myapp
+COPY welcome.go .
+RUN go build -o welcome .
+FROM scratch
+WORKDIR /myapp
+COPY --from=builder /myapp/welcome .
+ENTRYPOINT ["./welcome"]
+```
     
 
-    This multi-stage `Dockerfile` uses the latest
-    `golang` image as the parent image and this stage is named
-    `builder`. Next, the `/myapp` directory is
-    specified as the current working directory. Then, the
-    `COPY` directive is used to copy the
-    `welcome.go` source file and the `RUN` directive
-    is used to build the Golang file.
+This multi-stage `Dockerfile` uses the latest
+`golang` image as the parent image and this stage is named
+`builder`. Next, the `/myapp` directory is
+specified as the current working directory. Then, the
+`COPY` directive is used to copy the
+`welcome.go` source file and the `RUN` directive
+is used to build the Golang file.
 
-    The next stage of the `Dockerfile` uses the
-    `scratch` image as the parent image. This will set the
-    `/myapp` directory as the current working directory of the
-    Docker image. Then, the `COPY` directive is used to copy
-    the `welcome` executable from the builder stage to this
-    stage. Finally, `ENTRYPOINT` is used to run the
-    `welcome` executable.
+The next stage of the `Dockerfile` uses the
+`scratch` image as the parent image. This will set the
+`/myapp` directory as the current working directory of the
+Docker image. Then, the `COPY` directive is used to copy
+the `welcome` executable from the builder stage to this
+stage. Finally, `ENTRYPOINT` is used to run the
+`welcome` executable.
 
 8.  Build the Docker image using the following command:
 
     
-    ```
-    docker build -t welcome-optimized:v1 .
-    ```
+```
+docker build -t welcome-optimized:v1 .
+```
     
 
-    The image will be successfully built and tagged as
-    `welcome-optimized:v1`:
+The image will be successfully built and tagged as
+`welcome-optimized:v1`:
 
     
 ![](./images/B15021_04_06.jpg)
@@ -604,29 +587,27 @@ process. In this exercise, you are going to use a multi-stage
     when you build them on your computer:
 
     
-    ```
-    docker images
-    ```
+```
+docker images
+```
     
 
-    As you can see from the following output, the
-    `welcome-optimized` image has the same size as the
-    `welcome-runtime` image that you built in *Exercise 4.02,
-    Building a Docker Image with the Builder Pattern*:
+As you can see from the following output, the
+`welcome-optimized` image has the same size as the
+`welcome-runtime` image that you built in *Exercise 4.02,
+Building a Docker Image with the Builder Pattern*:
 
     
 ![](./images/B15021_04_07.jpg)
     
 
-In this exercise, you learned how to use multi-stage
-`Dockerfiles` to build optimized Docker images. The following
-table presents a summary of the key differences between the builder
-pattern and multi-stage `Docker Builds`:
+Run the docker image by running following command:
 
+```
+docker run welcome-optimized:v1
+```
 
-
-![](./images/B15021_04_08.jpg)
-
+![](./images/17.png)
 
 
 Activity 4.01: Deploying a Golang HTTP Server with a Multi-Stage Docker Build
@@ -704,10 +685,32 @@ You should get the following output when you navigate to the URL
 `http://127.0.0.1:8080/`:
 
 
-
 ![](./images/B15021_04_13.jpg)
 
+**Activity 4.01 Solution**
 
+Activity solution is present in `docker-course\lab04\Activity4.01` folder. Run the following command in the terminal to build and run the docker image:
+
+```
+docker image build -t activity:4.01 .
+
+docker container run -p 8080:8080 --name activity4.01 -d activity:4.01
+```
+
+**Output**:
+ 
+`http://127.0.0.1:8080/login`
+
+![](./images/18.png)
+
+
+You can stop and delete the container by running following commands:
+
+```
+docker container stop activity4.01
+
+docker container rm activity4.01
+```
 
 Summary
 =======
