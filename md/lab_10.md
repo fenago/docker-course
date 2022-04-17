@@ -1586,6 +1586,33 @@ automated processes and applications to validate and lint our
 `Dockerfiles` and `docker-compose.yml` file.
 
 
+Activity 12.02: Using hadolint to Improve the Best Practices on Dockerfiles
+---------------------------------------------------------------------------
+
+`hadolint` provides a great way to enforce best practices when
+you are creating your Docker images. In this activity, you will once
+again use the `Dockerfile` from the `docker-stress`
+image to see whether you can use the recommendations from
+`hadolint` to improve the `Dockerfile` so that it
+adheres to best practices as much as possible.
+
+The steps you\'ll need to complete this activity are as follows:
+
+1.  Ensure you have the `hadolint` image available and running
+    on your system.
+2.  Run the `hadolint` image over the `Dockerfile`
+    for the `docker-stress` image and record the results.
+3.  Make the recommended changes to the `Dockerfile` from the
+    previous step.
+4.  Test the `Dockerfile` again.
+
+You should get the following output on the successful completion of the
+activity:
+
+
+
+![](./images/B15021_12_03.jpg)
+
 
 Summary
 =======
