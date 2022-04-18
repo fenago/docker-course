@@ -12,6 +12,7 @@ build process. By the end of this lab, you will be able to write a
 `Dockerfile` using the common directives and build custom
 Docker images with the `Dockerfile`.
 
+<span style="color:red;">Important! All commands should be run from windows CMD unless mentioned otherwise.</span>
 
 
 Let\'s start by creating our first `Dockerfile` in the next exercise.

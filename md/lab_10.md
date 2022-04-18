@@ -66,6 +66,7 @@ being used by the image:
     docker rm -f $(docker -a -q)
     ```
     
+    **Note:** Above command should be run in `git bash` only. It will not work in cmd/powershell
 
 4.  On *line 3* of the `Dockerfile`, you\'ll notice that the
     `CMD` instruction is running the stress application

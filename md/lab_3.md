@@ -71,14 +71,6 @@ build time is reduced due to its use:
     ```
     
 
-    Note
-
-    The `docker history` command shows the layer of the
-    original image used as part of the `Dockerfile`
-    `FROM` command as `<missing>`. It is showing as
-    `missing` in our output as it was created on a different
-    system and then pulled onto your system.
-
 4.  Run the build again without making any changes:
 
     
@@ -90,22 +82,7 @@ build time is reduced due to its use:
     This will show you the build is done using the layers stored in the
     Docker image cache, thereby speeding up our build. Although this is
     only a small image, a much larger image would show a significant
-    increase:
-
-    
-    ```
-    Sending build context to Docker daemon  4.096kB
-    Step 1/3 : FROM alpine
-      ---> 961769676411
-    Step 2/3 : RUN apk update
-      ---> Using cache
-      ---> bcecd2429ac0
-    Step 3/3 : RUN apk add wget
-      ---> Using cache
-      ---> a6d7e99283d9
-    Successfully built a6d7e99283d9
-    Successfully tagged basic-app:latest
-    ```
+    increase.
     
 
 5.  Say you forgot to install the `curl` package as part of
@@ -294,7 +271,10 @@ your Docker images:
     ```
     docker rmi -f $(docker images -a -q)
     ```
-    
+
+    **Note:** Above command should be run in `git bash` only. It will not work in cmd/powershell.
+
+    ![](./images/14.png)    
 
     The command should return output like the following:
 
@@ -374,6 +354,7 @@ your Docker images:
     time docker build -t basic-app .
     ```
     
+    **Note:** Above command should be run in `git bash` only. It will not work in cmd/powershell
 
     The output will return the time taken to build the image:
 
@@ -536,7 +517,8 @@ your Docker images:
     ```
     time docker build -t basic-app .
     ```
-    
+
+    **Note:** Above command should be run in `git bash` only. It will not work in cmd/powershell.
 
     If you\'ve been watching the build, you\'ll notice that compared to
     our previous builds, it runs a lot quicker:
@@ -622,7 +604,7 @@ your Docker images:
 
     
     ```
-    docker commit ede3d51bba9e basic-app-test
+    docker commit UPDATE_CONTAINER_ID_HERE basic-app-test
     ```
     
 
@@ -786,7 +768,7 @@ same steps would be used for larger, more complex environments as well:
     `/tmp` directory:
     
     ```
-    docker cp UPDATE_ME:/var/www/html/basebackup.tar.gz D:\\
+    docker cp UPDATE_CONTAINER_ID_HERE:/var/www/html/basebackup.tar.gz D:\\
     ```
     
 
@@ -1328,7 +1310,7 @@ without using a registry:
     ```
     REPOSITORY                    TAG      IMAGE ID
       CREATED             SIZE
-    vincesestodocker/basic-app    1.0.0    2056b6e48b1a
+    hello-world                 latest    2056b6e48b1a
       29 minutes ago      8.8MB
     ```
     

@@ -7,6 +7,8 @@ container image from a container image registry. To view the container
 images that are stored locally, use the `docker images`
 command.
 
+<span style="color:red;">Important! All commands should be run from windows CMD unless mentioned otherwise.</span>
+
 The following exercise will demonstrate how to use the
 `docker run`, `docker ps`, and
 `docker images` commands to start and view the status of a
@@ -39,23 +41,23 @@ containers in your local development environment:
 ![](./images/1.png)
 
 
-    What just happened? You told Docker to run the container,
-    `hello-world`. So, first, Docker will look in its local
-    container cache for a container by that same name. If it doesn\'t
-    find one, it will look to a container registry on the internet in an
-    attempt to satisfy the command. By simply specifying the name of the
-    container, Docker will, by default, query Docker Hub for a published
-    container image by that name.
+What just happened? You told Docker to run the container,
+`hello-world`. So, first, Docker will look in its local
+container cache for a container by that same name. If it doesn\'t
+find one, it will look to a container registry on the internet in an
+attempt to satisfy the command. By simply specifying the name of the
+container, Docker will, by default, query Docker Hub for a published
+container image by that name.
 
-    As you can see, it was able to find a container called the
-    `library/hello-world` and began the process of pulling in
-    the container image layer by layer. You will get a closer look into
-    container images and layers in *Lab 2*, *Getting Started with
-    Dockerfiles*. Once the image has fully downloaded, Docker runs the
-    image, which displays the `Hello from Docker` output.
-    Since the primary process of this image is simply to display that
-    output, the container then stops itself and ceases to run after the
-    output displays.
+As you can see, it was able to find a container called the
+`library/hello-world` and began the process of pulling in
+the container image layer by layer. You will get a closer look into
+container images and layers in *Lab 2*, *Getting Started with
+Dockerfiles*. Once the image has fully downloaded, Docker runs the
+image, which displays the `Hello from Docker` output.
+Since the primary process of this image is simply to display that
+output, the container then stops itself and ceases to run after the
+output displays.
 
 2.  Use the `docker ps` command to see what containers are
     running on your system. In your Bash or PowerShell terminal, type
@@ -348,7 +350,7 @@ function. In this exercise, you will also pull the
 
     
     ```
-    docker inspect UPDATE_ME
+    docker inspect UPDATE_Ubuntu18.04_HERE
     ```
     
 
@@ -379,7 +381,7 @@ function. In this exercise, you will also pull the
 
     
     ```
-    docker inspect UPDATE_ME
+    docker inspect UPDATE_Ubuntu19.04_HERE
     ```
     
 
@@ -547,15 +549,7 @@ function. In this exercise, you will also pull the
     ```
     root@cfaa37795a7b:/# exit
     ```
-    
 
-    The command will return output like the following. Please note that
-    the output may vary for every user running the command:
-
-    
-    ```
-    user@developmentMachine:~/
-    ```
     
 
 14. Now create a second container called `ubuntu2` that will
@@ -633,6 +627,7 @@ function. In this exercise, you will also pull the
     docker exec -it ubuntu1 cat hello-world.txt
     ```
     
+    ![](./images/21.png)
 
     The output will display the `hello-world` message you
     passed into the container in the previous steps. Notice that as soon
@@ -1188,12 +1183,6 @@ CONTAINER ID  IMAGE         COMMAND                 CREATED
 29f115af8cdd  postgres:12   "docker-entrypoint.s…"  4 seconds ago
   Up 2 seconds        5432/tcp            blissful_kapitsa
 ```
-
-
-In the next activity, you will access the database that has just been
-set up in this activity inside the container instance. You will also
-interact with the container to fetch the list of databases running in
-the container.
 
 
 
