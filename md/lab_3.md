@@ -306,7 +306,7 @@ your Docker images:
     RUN apk update
     RUN apk add wget curl
 
-    RUN wget -O test.txt https://github.com/fenago/docker-course/blob/master/lab03/Exercise3.02/100MB.bin
+    RUN wget -O test.txt https://github.com/fenago/docker-course/raw/master/lab03/Exercise3.02/100MB.bin
 
     CMD mkdir /var/www/
     CMD mkdir /var/www/html/
@@ -417,7 +417,7 @@ your Docker images:
 
     RUN apk update && apk add wget curl
 
-    RUN wget -O test.txt https://github.com/fenago/docker-course/blob/master/lab03/Exercise3.02/100MB.bin
+    RUN wget -O test.txt https://github.com/fenago/docker-course/raw/master/lab03/Exercise3.02/100MB.bin
     
     CMD mkdir -p /var/www/html/
 
@@ -448,7 +448,7 @@ your Docker images:
     
     RUN apk update && apk add wget curl
     
-    RUN wget -O test.txt https://github.com/fenago/docker-course/blob/master/lab03/Exercise3.02/100MB.bin
+    RUN wget -O test.txt https://github.com/fenago/docker-course/raw/master/lab03/Exercise3.02/100MB.bin
      
     CMD mkdir -p /var/www/html/
     
@@ -478,7 +478,7 @@ your Docker images:
     
     RUN apk update && apk add wget curl
     
-    RUN wget -O test.txt https://github.com/fenago/docker-course/blob/master/lab03/Exercise3.02/100MB.bin
+    RUN wget -O test.txt https://github.com/fenago/docker-course/raw/master/lab03/Exercise3.02/100MB.bin
     ```
     
 
@@ -544,15 +544,6 @@ your Docker images:
     ```
     docker build --cache-from basic-base -t basic-app .
     ```
-    
-
-    We still have some more tasks before we complete this exercise. In
-    the following steps, we will look at committing changes to our image
-    to see how it affects our layers. This is not something we would use
-    often but there are times when we need to copy production data over
-    to a development or test environment, and one way to do this is by
-    using a Docker image with the `commit` command, which will
-    make changes to the top writable layer of our running container.
 
 15. Run `basic-app` in interactive shell mode to create some
     production data. To do this, run the following
@@ -578,7 +569,11 @@ your Docker images:
     text is not important; it is just a sample to show we can then copy
     these changes to another image:
 
-18. This is a sample production piece of data. Exit out of the running
+    ```
+    This is a sample production piece of data
+    ```
+
+18. This is a sample production piece of data. `exit` out of the running
     container and then check the container ID using the
     `docker ps` command with the `-a` option:
 
@@ -669,12 +664,6 @@ Docker images.
 
 
 
-
-
-
-
-
-
 Creating Base Docker Images
 ===========================
 
@@ -712,15 +701,13 @@ same steps would be used for larger, more complex environments as well:
     
 
 2.  Run the `tar` command on the running container to create a
-    backup of the system. To limit the information you have in the new
-    image, exclude the `.proc`, `.tmp`,
-    `.mnt`, `.dev`, and `.sys`
-    directories, and create everything under the
-    `basebackup.tar.gz` file:
+    backup:
     
     ```
-    tar -czf *
-    ```
+    touch index.html 
+
+    tar -czf basebackup.tar.gz *
+    ``` 
     
 
 3.  To ensure that you have data in your `basebackup.tar.gz`
@@ -738,7 +725,7 @@ same steps would be used for larger, more complex environments as well:
 
     
     ```
-    4.8M   basebackup.tar.gz
+    4.0K   basebackup.tar.gz
     ```
     
 
@@ -751,6 +738,7 @@ same steps would be used for larger, more complex environments as well:
     docker ps
     ```
     
+    **Note:** Run above command in new terminal.
 
     The command will return the container ID of the image:
 
@@ -771,6 +759,8 @@ same steps would be used for larger, more complex environments as well:
     docker cp UPDATE_CONTAINER_ID_HERE:/var/www/html/basebackup.tar.gz D:\\
     ```
     
+    ![](./images/23.png)
+
 
 
 Exercise 3.05: Tagging Docker Images
@@ -840,11 +830,6 @@ executable:
     docker tag new_busybox:ver_1 vince/busybox:ver_1.1
     ```
     
-
-    Note
-
-    We have used the author\'s name (`vince`) in this example.
-
 6.  Run the `docker images` command:
 
     
@@ -869,14 +854,13 @@ executable:
 7.  Create a basic image using a `Dockerfile` and the
     `-t` option of the `docker build` command to
     name and tag the image. You\'ve done this a few times already in
-    this lab, so from the command line, run the following command to
-    create a basic `Dockerfile`, using the
+    this lab, so from the command line, Create a basic `Dockerfile` and following content, using the
     `new_busybox` image you named earlier. Also include the
     tag for the image name, as Docker will try to use the
-    `latest` tag and, as this does not exist, it will fail:
+    `latest` tag and, as this does not exist, it will fail
     
     ```
-    echo "FROM new_busybox:ver_1" > Dockerfile
+    FROM new_busybox:ver_1
     ```
     
 
@@ -1029,6 +1013,7 @@ extend this file further:
     
     ```
     docker run vince/test:latest
+
     This is Version 1 of our service
     ```
     
@@ -1038,6 +1023,7 @@ extend this file further:
     
     ```
     docker run vince/test:version2
+    
     This is Version 2 of our service
     ```
     
@@ -1101,7 +1087,6 @@ again:
     WORKDIR /var/www/html/
     
     ADD Dockerfile.tar.gz /var/www/html/
-    RUN cat Dockerfile
     ```
 
 
@@ -1110,12 +1095,11 @@ again:
     for this build of `basic-app`:
     
     ```
-    echo "1.0.0" > VERSION
+    1.0.0
     ```
     
 
-9.  Make changes to the `Dockerfile` to remove the
-    `GIT_COMMIT` details added previously and add the
+9.  Make changes to the `Dockerfile` to add the
     `VERSION` file as part of your build. Adding it into the
     image itself means users can always refer to the `VERSION`
     file if ever they need to verify the image version number:
@@ -1166,6 +1150,7 @@ again:
     chmod +x build.sh 
     ```
     
+    **Note:** Above command should be run in `git bash` only. It will not work in cmd/powershell.
 
 13. Run the build script from the command line. `set -xe` in
     *line 1* of the script will make sure all commands are output to the
@@ -1176,31 +1161,16 @@ again:
     ```
     ./build.sh 
     ```
-    
-
-    Only the output of the build script is shown here as the rest of the
-    build process happens as normal:
-
-    
-    ```
-    ++ USERNAME=vincesestodocker
-    ++ IMAGE=basic-app
-    +++ cat VERSION
-    ++ version=1.0.0
-    ++ echo 'version: 1.0.0'
-    version: 1.0.0
-    ++ docker build -t vincesestodocker/basic-app:1.0.0 .
-    ```
-    
+       
+    **Note:** Above command should be run in `git bash` only. It will not work in cmd/powershell.
 
 14. View the image using the `docker images` command:
 
     
     ```
-    docker images vincesestodocker/basic-app
+    docker images <your_user_name>/basic-app
     ```
     
-
     It should reflect the name and tags created as part of the build
     script:
 
@@ -1208,7 +1178,7 @@ again:
     ```
     REPOSITORY                   TAG    IMAGE ID
       CREATED            SIZE
-    vincesestodocker/basic-app   1.0.0  94d0d337a28c
+    <your_user_name>/basic-app   1.0.0  94d0d337a28c
       29 minutes ago     8.8MB
     ```
     
@@ -1244,6 +1214,8 @@ without using a registry:
 
     
     ```
+    docker pull hello-world
+
     docker save -o D:\\hello-world.tar hello-world
     ```
     
@@ -1254,13 +1226,7 @@ without using a registry:
     image. You could actually use any name for the extension of the
     file.
 
-2.  Use the `du` command to verify that the
-    `basic-app.tar` file has data in it:
-    
-    ```
-    du -sh /tmp/basic-app.tar 
-    8.9M    /tmp/basic-app.tar
-    ```
+2.  Open `D:\\` in explorer and verify `hello-world.tar` has been created.
     
 
 3.  You can now move the image as you need to, whether it be via
@@ -1272,14 +1238,14 @@ without using a registry:
     just saved:
     
     ```
-    docker rmi -f 94d0d337a28c
+    docker rmi -f UPDATE_IMAGE_ID_HERE
     ```
     
 
 4.  Load the new image back as a Docker image using the
     `docker load` command with the `-i` option,
     pointing to where the packaged image is located. In this case, it is
-    the `/tmp` directory:
+    the `D:\\` directory:
 
     
     ```
