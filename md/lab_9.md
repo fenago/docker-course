@@ -100,8 +100,6 @@ To complete this exercise, perform the following steps:
 
 
 
-    It can be seen that the `kube-proxy` component running in
-    the Docker container has been up for 21 minutes.
 
 6.  Check for the second node component, `kubelet`, with the
     following command:
@@ -195,8 +193,8 @@ To complete this exercise, perform the following steps:
 
     
     ```
-    Client Version: v1.17.2
-    Server Version: v1.17.0
+    Client Version: v1.22.5
+    Server Version: v1.23.3
     ```
     
 
@@ -214,11 +212,10 @@ To complete this exercise, perform the following steps:
 
     
     ```
-    Kubernetes master is running at https://192.168.64.5:8443
-    KubeDNS is running at https://192.168.64.5:8445/api/v1/
-    namespaces/kube-system/Services/kube-dns:dns/proxy
-    To further debug and diagnose cluster problems, use 
-    'kubectl cluster-info dump'.
+    Kubernetes control plane is running at https://127.0.0.1:49900
+    CoreDNS is running at https://127.0.0.1:49900/api/v1/namespaces/kube-system/services/kube-dns:dns/proxy
+
+    To further debug and diagnose cluster problems, use 'kubectl cluster-info dump'.
     ```
     
 
@@ -265,12 +262,6 @@ The output lists the API resources available in the Kubernetes cluster
 we have connected to. As you can see, there are tens of resources you
 can use and each of them helps you to create cloud-native, scalable, and
 reliable applications.
-
-
-In the following section, the primary Kubernetes resources (seen in part
-of the last step in the previous exercise) will be presented.
-
-
 
 In the following exercise, you will see the Kubernetes resources in
 action using `kubectl` and the local Kubernetes cluster.
@@ -518,37 +509,14 @@ To complete this exercise, perform the following steps:
 ![](./images/B15021_10_13.jpg)
     
 
+**Note:** Run the command again after some time if container are in create state.
 
 
-10. Get the URL of `wordpress-service` by running the
-    following command:
+#### Stop Minikube
 
-    
-    ```
-    minikube service wordpress-service --url
-    ```
-    
+Run following command in the terminal to stop Minikube:
 
-    This command lists the URL of the Service, accessible from the host
-    machine:
-
-    
-    ```
-    http://192.168.64.5:32765
-    ```
-    
-
-    Open the URL in your browser to access the setup screen of
-    WordPress:
-
-    
-![](./images/B15021_10_14.jpg)
-    
-The setup screen indicates that the WordPress instances are running and
-accessible via their Service. Furthermore, it shows that the
-`StatefulSet` database is also running and accessible via its
-Service by the WordPress instances.
-
+`minikube stop`
 
 Summary
 =======

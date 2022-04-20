@@ -73,6 +73,7 @@ using Docker Swarm:
       Leader 
     ```
     
+    **Note:** We will use node Id in upcoming steps.
 
     For clarity here, we have removed the `Engine Version`
     column from our output.
@@ -258,7 +259,7 @@ using Docker Swarm:
     an output:
     
     ```
-    docker node update --availability drain j2qxrpf0a1yhvcax6n2ajux69
+    docker node update --availability drain UPDATE_NODE_ID_HERE
     ```
     
 
@@ -343,7 +344,7 @@ using Docker Swarm:
 
     
     ```
-    docker node update --availability active j2qxrpf0a1yhvcax6n2ajux69
+    docker node update --availability active UPDATE_NODE_ID_HERE
     ```
     
 
@@ -377,7 +378,7 @@ using Docker Swarm:
 
     
     ```
-    docker node inspect j2qxrpf0a1yhvcax6n2ajux69 --format "{{ .ManagerStatus.Reachability }}"
+    docker node inspect UPDATE_NODE_ID_HERE --format "{{ .ManagerStatus.Reachability }}"
     ```
     
 
@@ -395,7 +396,7 @@ using Docker Swarm:
 
     
     ```
-    docker node inspect j2qxrpf0a1yhvcax6n2ajux69 --format "{{ .Status.State }}"
+    docker node inspect UPDATE_NODE_ID_HERE  
     ```
     
 
@@ -409,10 +410,7 @@ using Docker Swarm:
 
 This exercise should have given you a good indication of how Docker
 Swarm is able to simplify your work, especially when you start to think
-about deploying your work into a production environment. We used the
-Docker Hub NGINX image, but we could easily use any service we have
-created as a Docker image that is available to our Swarm node.
-
+about deploying your work into a production environment.
 
 
 Summary

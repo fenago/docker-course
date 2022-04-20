@@ -224,7 +224,7 @@ To ping www.google.com, you will craft a container called
     
 
     As you can see in the following snippet, the pinging resumes and is
-    executed in the first terminal:
+    executed in the terminal:
 
     
     ```
@@ -286,18 +286,6 @@ To ping www.google.com, you will craft a container called
     You will not find the `testevents` container in the list
     because we just removed it from our system.
 
-    Now, you have seen all the various statuses of the container except
-    `CREATED`. This is typical, as you usually will not see
-    the `CREATED` status. Inside every container, there is a
-    main process with a **Process ID (PID)** of 0 and **Parent Process
-    ID (PPID)** of 1. This process has a different ID outside the
-    container. When this process is killed or removed, the container is
-    killed or removed as well. Normally, when the main process runs, the
-    state of the container changes from `CREATED` to
-    `UP`, and this indicates that the container has been
-    created successfully. If the main process fails, the container state
-    does not change from `CREATED`, and this is what you are
-    going to set up:
 
 14. Run the following command to see the `CREATED` status.
     Craft a container named `testcreate` from the
@@ -310,7 +298,7 @@ To ping www.google.com, you will craft a container called
     ```
     
 
-    The `time` command will generate an error because there is
+    The `time` command will generate an **error** because there is
     no such command inside `ubuntu:14.04`.
 
 15. Now, list the running containers:
@@ -390,7 +378,7 @@ state transition on data retention:
     state.
 
 2.  Dedicate the first terminal to the running container and execute the
-    commands in the second terminal. Having two terminals saves us from
+    commands in the second terminal. Having **two terminals** saves us from
     detaching the container to run a command and then reattaching to the
     container to run another command inside it.
 
@@ -428,14 +416,14 @@ state transition on data retention:
     
 
     Look for the `testsize` container. You will observe that
-    the size is `0B (virtual 188MB)`:
+    the size is `0B (virtual 197MB)`:
 
     
     ```
     CONTAINER ID    IMAGE          COMMAND      CREATED
       STATUS     PORTS    NAMES      SIZE
     9f2d2d1ee3e0    ubuntu:14.04   "/bin/bash"  6 seconds ago
-      Up 6 minutes        testsize   0B (virtual 188MB)
+      Up 6 minutes        testsize   0B (virtual 197MB)
     ```
     
 
@@ -478,8 +466,7 @@ state transition on data retention:
     
 
     As you can see from the following snippet, the size of the
-    `testsize` container is
-    `27.8 MB (virtual 216 MB)`:
+    `testsize` container is `2.98MB (virtual 199MB)`:
 
     
     ```
@@ -503,255 +490,20 @@ top writable layer. Knowing the size that every container consumes is
 useful to avoid an out-of-disk-space exception. Moreover, it can help us
 in troubleshooting and setting a maximum size for every container.
 
-**Note**
-
-Docker uses storage drivers to write in the writable layer. To find out what driver your operating system is using, run the
-`docker info` command.
-
-
-Now, let\'s delve into the stateful and stateless modes to decide which
-container needs persistent storage.
-
-
-
-
-Exercise 7.03: Creating and Scaling a Stateless Service, NGINX
---------------------------------------------------------------
-
-In this exercise, you will focus on creating a stateless service, NGINX,
-solely, and see how easy it is to scale it. You will initialize a swarm
-to create a cluster and scale NGINX on it. You will use the Docker
-playground to work in swarm mode:
-
-1.  Connect to the Docker playground at
-    https://labs.play-with-docker.com/, as in *Figure 7.2*:
-
-    
-![](./images/B15021_07_02.jpg)
-    
-
-
-
-2.  Click on `ADD NEW INSTANCE` in the left menu to create a
-    new node. Get the node IP from the top node information section.
-    Now, create a swarm using the `docker swarm init` command
-    with the `–advertise-addr` option to specify the node IP.
-    As in *Figure 7.2*, the Docker Engine generates a long token to
-    allow other nodes, whether managers or workers, to join the cluster:
-    
-    ```
-    docker swarm init --advertise-addr <IP>
-    ```
-    
-
-3.  Use the `docker service create` command to create a
-    service and specify port `80` using the `-p`
-    option. Set the number of replicas as `2` for the
-    `--replicas` option of the `nginx:1.14.2` image:
-
-    
-    ```
-    docker service create -p 80 --replicas 2 nginx:1.14.2
-    ```
-    
-
-    The `docker service create` command creates two replica
-    services from the `nginx:1.14.2` image at port
-    `80` inside the container. The Docker daemon chooses any
-    available host port. In this case, it chooses port
-    `30000`, as shown at the top of *Figure 7.2*.
-
-4.  To verify that the service has been created, list all of the
-    available services using the `docker service ls` command:
-
-    
-    ```
-    docker service ls
-    ```
-    
-
-    As shown in the following output, the Docker daemon auto-generated a
-    service ID and assigned a name, `amazing_hellman`, to the
-    service because you did not specify one using the `--name`
-    option:
-
-    
-    ```
-    ID            NAME             MODE        REPLICAS  IMAGE
-         PORTS
-    xmnp23wc0m6c  amazing_hellman  replicated  2/2       nginx:1.14.2
-         *:30000->80/tcp
-    ```
-    
-
-    Note
-
-    In a container, the Docker daemon assigns a random
-    **adjective\_noun** name to the container.
-
-5.  Use the `curl <IP:Port Number>` Linux command to see the
-    output of the service and connect to it without using a browser:
-
-    
-    ```
-    $curl 192.168.0.223:3000
-    ```
-    
-
-    The output is an HTML version of the welcome page of
-    `NGINX`. This indicates it has been installed correctly:
-
-    
-    ```
-    <!DOCTYPE html>
-    <html>
-    <head>
-    <title>Welcome to nginx!</title>
-    <style>
-        body {
-            width: 35em;
-            margin: 0 auto;
-            font-family: Tahoma, Verdana, Arial, sans-serif;
-        }
-    </style>
-    </head>
-    </body>
-    <h1>Welcome to nginx!<h1>
-    <p>If you see this page, the nginx web server is successfully 
-    installed and working. Further configuration is required. </p>
-    <p>For online documentation and support please refer to
-    <a href="http://nginx.org/">nginx.org</a>.<br/>
-    Commercial support is available at
-    <a href="http://nginx.com/">nginx.com</a>.</p>
-    <p><em>Thank you for using nginx.</em></p>
-    </body>
-    <html>
-    ```
-    
-
-6.  Assume that business is booming even more, and two replicas are not
-    enough. You need to scale it to five replicas instead of two. Use
-    the
-    `docker service scale <service name>=<number of replicas>`
-    subcommand:
-
-    
-    ```
-    docker service scale amazing_hellman=5
-    ```
-    
-
-    You will get an output like the following:
-
-    
-    ```
-    amazing_hellman scaled to 5
-    overall progress: 5 out of 5 tasks
-    1/5: running
-    2/5: running
-    3/5: running
-    4/5: running
-    5/5: running
-    verify: Service converged
-    ```
-    
-
-7.  To verify that the Docker swarm replicated the service, use the
-    `docker service ls` subcommand one more time:
-
-    
-    ```
-    docker service ls
-    ```
-    
-
-    The output shows that the number of replicas increased from
-    `2` to `5` replicas:
-
-    
-    ```
-    ID            NAME             MODE        REPLICAS  IMAGE
-         PORTS
-    xmnp23wc0m6c  amazing_hellman  replicated  5/5       nginx:1.14.2
-         *:30000->80/tcp
-    ```
-    
-
-8.  Delete the service using the `docker service rm`
-    subcommand:
-
-    
-    ```
-    docker service rm amazing_hellman
-    ```
-    
-
-    The command will return the name of the service:
-
-    
-    ```
-    amazing_hellman
-    ```
-    
-
-9.  To verify that the service has been deleted, list the service one
-    more time using the `docker service ls` subcommand:
-
-    
-    ```
-    docker service ls
-    ```
-    
-
-    The output will be an empty list:
-
-    
-    ```
-    ID       NAME      MODE      REPLICAS      IMAGE      PORTS
-    ```
-    
-
-In this exercise, you deployed a stateless service, NGINX, and scaled it
-using the `docker service scale` command. You then used the
-Docker playground (a free solution that you can use to create a cluster,
-and Swarm to initialize a swarm).
-
-Note
-
-This exercise uses Docker Swarm. To do the same using Kubernetes, you
-can follow the steps at
-https://kubernetes.io/docs/tasks/run-application/run-stateless-application-deployment/.
-
-Now, we are done with the frontend example of NGINX. In the next
-exercise, you will see how to create a stateful service that requires
-persistent data. We will use a database service, MySQL, to complete the
-following exercise.
-
 
 
 Exercise 7.04: Deploying a Stateful Service, MySQL
 --------------------------------------------------
 
-As mentioned previously, web-based applications have a frontend and a
-backend. You have already seen an example of the frontend component in
-the previous exercise. In this exercise, you will deploy a single
+In this exercise, you will deploy a single
 stateful MySQL container to be the database as a backend component.
 
 To install MySQL, follow the steps at https://hub.docker.com/\_/mysql in
 the `via stack deploy` section. Select and copy the
 `stack.yml` file to memory:
 
-1.  Use an editor to paste the `stack.yml` file. You can use
-    the `vi` or `nano` Linux commands to open a text
-    editor in Linux and paste the YAML file:
-
-    
-    ```
-    $vi stack.yml
-    ```
-    
-
-    Paste the following code:
+1.  Use an editor to paste the `stack.yml` file. You can open a text
+    editor and paste the following code:
 
     
     ```
@@ -783,27 +535,8 @@ the `via stack deploy` section. Select and copy the
     `adminer` service, the policy is set to always restart if
     it fails for any reason.
 
-2.  Press the *Esc* key on the keyboard. Then, run the following command
-    to quit and save the code:
-    
-    ```
-    :wq
-    ```
-    
 
-3.  To verify that the file has saved correctly, use the `cat`
-    Linux command to display the `stack.yml` contents:
-
-    
-    ```
-    $cat stack.yml
-    ```
-    
-
-    The file will be displayed. If there is an error, repeat the
-    previous steps.
-
-4.  If the code is correct, deploy the `YML` file by using the
+2.  If the code is correct, deploy the `YML` file by using the
     `docker stack deploy` subcommand:
 
     
@@ -821,19 +554,8 @@ the `via stack deploy` section. Select and copy the
     Creating service mysql_db
     Creating service mysql_adminer
     ```
-    
 
-    To connect to the service, right-click on port `8080` at
-    the top beside the node IP in the Docker playground window and open
-    it in a new window:
-
-    
-![](./images/B15021_07_03.jpg)
-    
-
-
-
-5.  Use the `docker stack ls` subcommand to list the stacks:
+3.  Use the `docker stack ls` subcommand to list the stacks:
 
     
     ```
@@ -850,7 +572,7 @@ the `via stack deploy` section. Select and copy the
     ```
     
 
-6.  Use the `docker stack rm` subcommand to remove the stack:
+4.  Use the `docker stack rm` subcommand to remove the stack:
 
     
     ```
@@ -874,27 +596,11 @@ In this exercise, you deployed a stateful service, MySQL, and were able
 to access the database service from the browser. Again, we used the
 Docker playground as our platform to execute the exercise.
 
-Note
 
-Replicating MySQL is not an easy task. You cannot run multiple replicas
-on one data folder as we did in *Exercise 7.03*, *Creating and Scaling a
-Stateless Service, NGINX*. This way does not work because data
-consistency and database locking and caching must be applied to ensure
-your data is correct. Hence, MySQL uses a master and subordinate
-replication, where you write to the master, and the data gets
-synchronized to the subordinates. To find out more about MySQL
-replication, please visit
-https://dev.mysql.com/doc/refman/8.0/en/replication.html.
 
 We have learned that containers need persistent storage that outlives
 the container life cycle but have not yet covered how to do that. In the
 next section, we will learn about volumes to save persistent data.
-
-
-
-
-
-
 
 
 
@@ -1017,12 +723,11 @@ when you do not have a container on your system:
     ```
     
 
-8.  Check the contents of the new file from the host by running the
-    following command:
+8.  Check the new file exists by running the following command:
 
     
     ```
-    sudo ls /var/lib/docker/volumes/vol1/_data
+    docker container run -it -v vol1:/container_vol --name tesatvolume ubuntu:14.04 ls /container_vol
     ```
     
 
@@ -1032,15 +737,6 @@ when you do not have a container on your system:
     ```
     new_file.txt
     ```
-    
-
-9.  Verify that the word `hello`, as the content of the file,
-    is saved as well by running the following command:
-    
-    ```
-    sudo cat /var/lib/docker/volumes/vol1/_data/new_file.txt
-    ```
-    
 
 10. Remove the container with the `-v` option to remove any
     volumes that are created within the container\'s scope:
@@ -1048,6 +744,7 @@ when you do not have a container on your system:
     
     ```
     docker container rm -v container1
+    docker container rm -v tesatvolume
     ```
     
 
@@ -1199,17 +896,6 @@ container was removed by using the `-v` option in the
 `rm` subcommand. Docker removed the volume this time because
 the volume was initially created within the container\'s scope.
 
-Note
-
-1\. If you are mounting a volume to a service and not to a container,
-you cannot use the `-v` or `--volume` options. You
-must use the `--mount` option.
-
-2\. To delete all the anonymous volumes that were not removed when their
-containers were removed, you can use the `docker volume prune`
-subcommand.
-
-For further details, visit https://docs.docker.com/storage/volumes/.
 
 Now, we are going to see some more examples of volumes being used with
 stateful containers. Remember that using volumes with stateful
@@ -1372,6 +1058,7 @@ exercise, you will run a PostgreSQL container with a database volume:
     
     ```
     docker container exec -it db2 psql -U postgres
+
     postgres=# SELECT * FROM PEOPLE;
     ```
     
@@ -1644,58 +1331,11 @@ some of which are described as follows:
     ```
     
 
-    You will get the details of the container, like the following:
-
-    
-    ```
-    CONTAINER ID    IMAGE     COMMAND                 CREATED
-      STATUS       PORTS         NAMES
-    55c60ad38164    postgres  "docker-entrypoint.s…"  2 hours ago
-      Up 2 hours   5432/tcp      db_with
-    ```
-    
 
 So far, we have been sharing volumes between containers and the Docker
 host. This sharing type is not the only type available in Docker. You
 can also share volumes between containers. Let\'s see how to do that in
 the next section.
-
-
-
-
-
-
-
-
-
-Persistent and Ephemeral Volumes
-================================
-
-
-There are two types of volumes: persistent and ephemeral ones. What we
-have seen so far is persistent volumes, which are between the host and
-the container. To share the volume between containers, we use the
-`--volumes-from` option. This volume exists only as long as it
-is being used by a container. When the last container using the volume
-exits, the volume disappears. This type of volume can be passed from one
-container to the next but is not saved. These volumes are called
-ephemeral volumes.
-
-Volumes can be used to share log files between the host and the
-container or between containers. It is much easier to share them on a
-volume with the host so that even if the container was removed for an
-error, we can still track the error by checking the log file on the host
-after the container\'s removal.
-
-Another common use of volumes in practical microservices applications is
-sharing the code on a volume. The advantage of this practice is that you
-can achieve zero downtime. The developer team can edit the code on the
-fly. The team can work on adding new features or changing the interface.
-Docker monitors the update in the code so that it executes the new code.
-
-In the following exercise, we will explore the data container and learn
-some new options to share volumes between containers.
-
 
 
 Exercise 7.09: Sharing Volumes between Containers
@@ -1897,12 +1537,6 @@ committed image using the filesystem, rather than volumes.
 
 
 
-
-
-
-
-
-
 Volumes versus Filesystem and Images
 ====================================
 
@@ -2066,6 +1700,7 @@ find the directory in the container and the data saved in it:
     docker container rm -f $(docker container ls -aq)
     ```
     
+    **Note:** Above command should be run in `git bash` only. It will not work in cmd/powershell.
 
     The command will return the IDs of the containers that will be
     removed.
@@ -2138,16 +1773,7 @@ find the directory in the container and the data saved in it:
     ```
     ls
     ```
-    
 
-    You will find `file.txt` is saved this time:
-
-    
-    ```
-    bin  boot  dev  etc  home  lib  lib64  media  mnt  new  opt
-    proc  root  run sbin  srv  sys  tmp  usr  var
-    ```
-    
 
 10. Navigate to the `new` directory and verify that the
     container can access `file.txt` using the `ls`
@@ -2195,40 +1821,6 @@ find the directory in the container and the data saved in it:
 In this exercise, you saw that data is uploaded to the image when the
 filesystem is used, compared to the situation we saw when data was saved
 on volumes.
-
-
-Activity 7.02: Sharing NGINX Log Files with the Host
-----------------------------------------------------
-
-As we mentioned before, it is useful to share the log files of an
-application to the host. That way, if the container crashes, you can
-easily check its log files from outside the container since you will not
-be able to extract them from the container. This practice is useful with
-stateless and stateful containers.
-
-In this activity, you will share the log files of a stateless container
-crafted from the NGINX image with the host. Then, verify these files by
-accessing the NGINX log files from the host.
-
-**Steps**:
-
-1.  Verify that you do not have the `/var/mylogs` folder on
-    your host.
-
-2.  Run a container based on the NGINX image. Specify the path of the
-    shared volumes on the host and inside the container in the
-    `run` command. Inside the container, NGINX uses the
-    `/var/log/nginx` path for the log files. Specify the path
-    on the host as `/var/mylogs`.
-
-3.  Go to the path of `/var/mylogs`. List all the files in
-    that directory. You should find two files there:
-
-    
-    ```
-    access.log       error.log
-    ```
-    
 
 
 
